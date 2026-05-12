@@ -75,7 +75,7 @@ Målet med fasen är att göra projektet lätt att vidareutveckla utan att ändr
 ## Nästa bästa steg
 
 1. Slutför städpasset och verifiera att nuvarande spelbeteende fortfarande fungerar.
-2. Dela upp `modes.jsx` i separata mode-filer när första refactorn är grön.
-3. Dela upp `map.jsx` ytterligare i Leaflet-livscykel, street layers, labels och scratch overlay.
-4. Gör en UX-runda på slutskärmar, medaljer och rundinställningar.
-5. Gör ett datapass för stadsdelspolygoner och bättre hantering av segmenterade gator.
+2. Gör ett datapass för stadsdelspolygoner och bättre hantering av områdesklassning.
+3. Gör en UX-runda på rundinställningar, medaljer och replay-loop.
+4. Utöka smoke-testet med Results/Share/Trivia när den ytan stabiliserats.
+5. Planera Vite/ES-moduler först när statisk scriptordning blir ett verkligt hinder.

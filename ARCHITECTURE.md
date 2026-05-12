@@ -22,7 +22,11 @@ Det är medvetet okej för prototypen, men inför 1.0 bör projektet troligen fl
 - `data/fallback-streets.js`: genererad OSM-bundle. Ska inte handredigeras.
 - `game-utils.jsx`: fuzzy matching, ledtrådar, svårighet, poäng och rundslumpning.
 - `map-rendering.jsx`: lågnivåhjälpare för kartstil, street widths och scratch-strokes.
-- `map.jsx`: Leaflet-komponenten och dess React-livscykel.
+- `map/leaflet-core.jsx`: Leaflet-init, focus/zoom, resize och style-progress.
+- `map/street-layers.jsx`: street-polylines, hit areas och state styling.
+- `map/scratch-overlay.jsx`: paper canvas, street sketch och reveal/scratch-overlay.
+- `map/labels.jsx`: street labels och district labels.
+- `map.jsx`: tunn React-wrapper som kopplar Leaflet-mapens effekter till helper-filerna.
 - `modes/guess-pop.jsx`: delad popover-komponent (input + ledtråd) som Fill och Time använder.
 - `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`: ett spelläge per fil. Var och en lindar sin React-komponent i en IIFE och exponerar via `window.<Mode>Mode`.
 - `screens.jsx`: meny, områdesval, resultat, loading och error.
@@ -34,4 +38,5 @@ OSM-geometri är facit för gatans läge, form och klickyta. All handritad eller
 
 ## Närmaste refactor-mål
 
-- Dela `map.jsx` i hook/komponenter för map init, street layers, labels och scratch overlay.
+- Minska `screens.jsx` genom att lyfta Results till egen fil när nästa resultatrunda görs.
+- Utvärdera Vite/ES-moduler först när fler browser-/unit-tester kräver riktig modulmiljö.

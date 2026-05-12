@@ -48,6 +48,12 @@ Polish triggered by Sander's live testing:
 - Trivia om Stockholm: 6 stadsdelar och 29 gator handkurerade i `data/trivia.js` (sv + en). Visas i Lär-läge under hovered gata och i Results "Visste du?"-sektion. 12 tester i `scripts/test-trivia.mjs` (`1c86416`).
 - "Du tänkte på X"-feedback: när en gissning matchar en annan riktig gata (parallellgators-förvirring), visa "Du tänkte på {name}. Försök igen" istället för generisk "fel". Funkar i Fill, Quiz typed och Quiz click. 5 tester för `findGuessedStreet` (`ff7bad5`).
 
+### 2026-05-12 — Codex (map split pass)
+- Pushade först allt lokalt arbete till `origin/main` (`4f48f1c`).
+- Delade upp `map.jsx` i `map/leaflet-core.jsx`, `map/street-layers.jsx`, `map/scratch-overlay.jsx` och `map/labels.jsx`.
+- `map.jsx` är nu en tunn React-wrapper som bara kopplar effekter till helper-filerna.
+- `index.html`, `scripts/check-static.mjs` och `ARCHITECTURE.md` uppdaterade för den nya strukturen.
+
 ### 2026-05-12 — Claude (OSM pipeline merge + orienteringshint)
 - Strandvägen kom som två frågor i Quiz: OSM:s ways för en gata som korsar district-bounds blev två separata entities (`norrmalm::strandvägen` + `ostermalm::strandvägen`). `processOverpass` grupperar nu by name only och bestämmer primärt district by majoritet av way-points. Bundle regenererad: 933 streets (-43 = duplikaterna borta). +1 test för cross-district-fallet (`23932b9`).
 - Paper-vyn var svår att orientera sig på (bara ett "streck"): lägg in svaga streckade rektangel-ramar per active district med alpha 0.18, under streetskissen. Ingen kustlinje eller geometri avslöjas (`8623d76`).
@@ -101,7 +107,7 @@ Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 1. [x] **Enhetstestsvit för `game-utils.jsx`** — levererad 2026-05-12. `scripts/test-game-utils.mjs`, 26 tester, kör med `node scripts/test-game-utils.mjs`. Bygg vidare här när nya spelregler läggs till.
 2. [x] **Lyft OSM-processing till delad modul** — levererad 2026-05-12. `data/osm-pipeline.js` delas mellan live-fetch och bundle-script. 15 enhetstester i `scripts/test-osm-pipeline.mjs`.
 3. [x] **Dela upp `modes.jsx`** — levererad 2026-05-12. Fem filer under `modes/`, IIFE-mönster, scriptordning i `index.html` uppdaterad.
-4. **Dela upp `map.jsx`** (stor, högre risk). Mål: `map/leaflet-init.jsx`, `map/street-layers.jsx`, `map/labels.jsx`, `map/scratch-overlay.jsx`. Var försiktig med Leaflet-livscykeln; nuvarande effekter ordnas medvetet.
+4. [x] **Dela upp `map.jsx`** — levererad 2026-05-12. `map.jsx` är tunn wrapper; helpers finns i `map/leaflet-core.jsx`, `map/street-layers.jsx`, `map/scratch-overlay.jsx`, `map/labels.jsx`.
 5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
 6. [x] **Smoke-test för `?fallback=1`-flödet** — levererad 2026-05-12. `e2e/smoke.spec.mjs` via Playwright. Bygg vidare här när nya spelflöden behöver täckning.
 
@@ -113,7 +119,7 @@ Vilka filer hör ihop. Två agenter som båda rör samma rad är en merge-konfli
 |---|---|
 | OSM-data + bundeln | `data/osm.js`, `scripts/build-osm-bundle.mjs`, `data/fallback-streets.js` |
 | Spelregler och matchning | `game-utils.jsx`, `modes.jsx` |
-| Karta + rendering | `map.jsx`, `map-rendering.jsx`, `styles.css` |
+| Karta + rendering | `map.jsx`, `map-rendering.jsx`, `map/*.jsx`, `styles.css` |
 | Skärmar och layout | `screens.jsx`, `components.jsx` |
 | Konfiguration och i18n | `data/city-stockholm.js`, `data/i18n.js`, `app.jsx` |
 | Legacy (decorative only) | `data/map.js`, `v1 sketched.html` |
