@@ -197,11 +197,20 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
   const [, force] = useS(0);
   const inputRef = useR(null);
   const speechRef = useR(null);
+  const triesRef = useR(0);
+  const resolvingRef = useR(false);
   useE(() => { const id = setInterval(() => force(t => t + 1), 1000); return () => clearInterval(id); }, []);
   useE(() => {
     setAnswer('');
     if (answerMode === 'type') setTimeout(() => inputRef.current && inputRef.current.focus(), 0);
-  }, [idx, answerMode]);
+  }, [answerMode]);
+  useE(() => {
+    resolvingRef.current = false;
+    triesRef.current = 0;
+    setTries(0);
+    setAnswer('');
+    if (answerMode === 'type') setTimeout(() => inputRef.current && inputRef.current.focus(), 0);
+  }, [idx]);
   useE(() => () => { if (speechRef.current) speechRef.current.abort(); }, []);
 
   const target = queue[idx] || null;
@@ -220,11 +229,13 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
       onFinish({ mode: 'quiz', total: queue.length, correct: solvedSet.size, missed: queue.length - solvedSet.size, time: elapsed, bestStreak: best, solvedIds: [...solvedSet], revealedIds: [...missedSet] });
       return;
     }
+    triesRef.current = 0;
     setIdx(i => i + 1); setTries(0); setAnswer('');
   }, [idx, queue.length, solvedIds, bestStreak, missedIds, startTime, onFinish]);
 
   const completeTarget = useC((match = { quality: 'exact' }) => {
-    if (!target) return;
+    if (!target || resolvingRef.current) return;
+    resolvingRef.current = true;
     const n = new Set(solvedIds); n.add(target.id); setSolvedIds(n);
     const nextBest = Math.max(bestStreak, streak + 1);
     setStreak(s => { const v = s + 1; setBestStreak(b => Math.max(b, v)); return v; });
@@ -234,20 +245,23 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
   }, [target, solvedIds, missedIds, bestStreak, streak, t, next]);
 
   const missTarget = useC(() => {
-    if (!target) return;
+    if (!target || resolvingRef.current) return;
+    resolvingRef.current = true;
     const n = new Set(missedIds); n.add(target.id); setMissedIds(n);
     setAnswer('');
-    setFlash({ tone: 'warn', text: `${t('feedback.revealed')} ${target.name}` });
+    setFlash({ tone: 'warn', text: `${t('feedback.correct_answer')} ${target.name}` });
     setTimeout(() => next(solvedIds, n, bestStreak), 1200);
   }, [target, missedIds, solvedIds, bestStreak, t, next]);
 
   const registerWrongTarget = useC(() => {
-    const nextTries = tries + 1;
+    if (resolvingRef.current) return;
+    const nextTries = triesRef.current + 1;
+    triesRef.current = nextTries;
     setTries(nextTries);
     setStreak(0);
     if (nextTries >= 2) missTarget();
     else setFlash({ tone: 'warn', text: t('feedback.try_again') });
-  }, [tries, missTarget, t]);
+  }, [missTarget, t]);
 
   const handleClick = useC((street) => {
     if (!target || answerMode !== 'click') return;
@@ -307,6 +321,7 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
         <div className="hud-center hud-progress">
           <HudPill k={t('hud.score')} v={`${solvedIds.size}/${queue.length}`} />
           <div className="bar"><i style={{ width: `${queue.length ? (idx/queue.length)*100 : 0}%` }}/></div>
+          <HudPill k={t('results.missed')} v={missedIds.size} />
           <HudPill k={t('hud.streak')} v={streak} />
         </div>
         <div className="hud-right">
