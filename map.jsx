@@ -1,4 +1,4 @@
-/* global React, L, window, DISTRICTS, streetStrokeWidth, streetHitWidth, streetWidthBaseFromClass, getMapStylePreset, hashStreet, jitter, drawScrapeStroke, drawScratchChips */
+/* global React, L, window, DISTRICTS, streetStrokeWidth, streetHitWidth, streetWidthBaseFromClass, getMapStylePreset, hashStreet, drawEraserBrush */
 // Gatlykta — Leaflet-based map with scratch-reveal overlay.
 
 const { useState: useSm, useEffect: useEm, useRef: useRm, useMemo: useMm, useCallback: useCm } = React;
@@ -256,43 +256,18 @@ function LeafletMap({
       ctx.globalAlpha = 1;
       // Punch holes for solved streets (destination-out wipes paper to reveal satellite)
       ctx.globalCompositeOperation = 'destination-out';
-      const sw = Math.max(18, 34 - (15 - z) * 3) * style.block;
+      ctx.globalAlpha = 1;
+      const brushWidth = Math.max(14, 26 - (15 - z) * 2.4) * style.block;
       for (const s of streets) {
         if (activeDistricts && !activeDistricts.includes(s.district)) continue;
         if ((streetStates[s.id] || 'idle') !== 'solved') continue;
-        const prog = reveals[s.id] = Math.min(1, (reveals[s.id] || 0) + 0.075);
-        // Reveal like a lottery-ticket scrape: narrow angular strokes, square caps,
-        // and small chipped edges instead of a soft watercolor wash.
-        for (const pass of [
-          { width: sw * 0.58, alpha: 0.72, repeats: 3, jitter: 5, spread: sw * 0.40, speed: 1.18 },
-          { width: sw * 0.30, alpha: 0.92, repeats: 7, jitter: 10, spread: sw * 0.88, speed: 1.08 },
-          { width: sw * 0.16, alpha: 0.62, repeats: 9, jitter: 17, spread: sw * 1.28, speed: 0.95 },
-        ]) {
-          ctx.lineCap = 'butt';
-          ctx.lineJoin = 'miter';
-          ctx.lineWidth = pass.width;
-          ctx.globalAlpha = pass.alpha;
-          ctx.strokeStyle = '#000';
-          for (const way of s.ways) {
-            if (way.length < 2) continue;
-            const pts = way.map(toCanvasPoint);
-            for (let r = 0; r < pass.repeats; r++) {
-              const seed = hashStreet(s.id, r);
-              const laneBase = pass.repeats === 1 ? 0 : (r / (pass.repeats - 1) - 0.5) * pass.spread;
-              const lane = laneBase + jitter(seed, 71, pass.spread * 0.10);
-              const revealProgress = Math.min(1, Math.max(0, prog * pass.speed - r * 0.018));
-              drawScrapeStroke(ctx, pts, revealProgress, seed, pass.width, lane, pass.jitter);
-            }
-            if (prog > 0.18) {
-              ctx.globalAlpha = 0.42;
-              ctx.fillStyle = '#000';
-              drawScratchChips(ctx, pts, Math.min(1, prog * 1.18), hashStreet(s.id, 99), sw);
-              ctx.globalAlpha = pass.alpha;
-            }
-          }
+        const prog = reveals[s.id] = Math.min(1, (reveals[s.id] || 0) + 0.06);
+        for (const way of s.ways) {
+          if (way.length < 2) continue;
+          const pts = way.map(toCanvasPoint);
+          drawEraserBrush(ctx, pts, prog, hashStreet(s.id), brushWidth);
         }
       }
-      ctx.globalAlpha = 1;
       ctx.restore();
       // Continue animating if anything is still revealing
       const animating = Object.entries(streetStates).some(([id, st]) => st === 'solved' && (reveals[id] || 0) < 1);
@@ -306,7 +281,15 @@ function LeafletMap({
       if (!raf) raf = requestAnimationFrame(() => { raf = null; draw(); });
     };
     const onZoomStart = () => { zooming = true; canvas.style.opacity = '0'; };
-    const onZoomEnd = () => { zooming = false; canvas.style.opacity = '1'; trigger(); };
+    const onZoomEnd = () => {
+      zooming = false;
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      // Reposition + redraw synchronously before showing the canvas again,
+      // otherwise the still-faded-in canvas is briefly visible at its old
+      // pre-zoom position which reads as an offset jump.
+      draw();
+      canvas.style.opacity = '1';
+    };
     map.on('drag dragend move moveend resize viewreset', trigger);
     map.on('zoomstart', onZoomStart);
     map.on('zoomend', onZoomEnd);

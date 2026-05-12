@@ -84,40 +84,74 @@ function drawScrapeStroke(ctx, pts, progress, seed, width, laneOffset, jitterAmo
   if (started) ctx.stroke();
 }
 
-function drawScratchChips(ctx, pts, progress, seed, sw) {
+// Eraser brush: stamps soft elliptical marks along the street path. Used with
+// destination-out composite so each stamp punches a soft hole through the
+// paper overlay. Gives a pencil/eraser sweep feel rather than a cartoon scrape.
+//
+// - stamps are dense (spacing = brushWidth * 0.22) so coverage is smooth
+// - each stamp uses a radial gradient (soft edge)
+// - the ellipse is rotated along the street direction with small jitter
+// - width and perpendicular offset vary per stamp for handmade feel
+function drawEraserBrush(ctx, pts, progress, seed, brushWidth) {
   if (!pts || pts.length < 2 || progress <= 0) return;
-  let total = 0;
+
   const segs = [];
+  let total = 0;
   for (let i = 1; i < pts.length; i++) {
-    const len = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
-    if (len > 0) { segs.push({ i, len }); total += len; }
+    const dx = pts[i].x - pts[i - 1].x;
+    const dy = pts[i].y - pts[i - 1].y;
+    const len = Math.hypot(dx, dy);
+    if (len > 0) { segs.push({ a: pts[i - 1], b: pts[i], len }); total += len; }
   }
+  if (!total) return;
+
   const limit = total * Math.max(0, Math.min(1, progress));
-  const spacing = Math.max(16, sw * 0.62);
-  let nextChip = spacing * 0.45;
-  let travelled = 0;
+  const spacing = Math.max(2, brushWidth * 0.22);
+
+  let traveled = 0;
+  let nextStamp = 0;
+  let stampIdx = 0;
+
   for (const seg of segs) {
-    const a = pts[seg.i - 1];
-    const b = pts[seg.i];
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
+    if (traveled >= limit) break;
+    const dx = seg.b.x - seg.a.x;
+    const dy = seg.b.y - seg.a.y;
     const angle = Math.atan2(dy, dx);
-    while (travelled + seg.len >= nextChip && nextChip <= limit) {
-      const t = (nextChip - travelled) / seg.len;
-      const base = { x: a.x + dx * t, y: a.y + dy * t };
-      const side = jitter(seed, Math.round(nextChip), sw * 0.95);
-      const chip = offsetPoint(base, a, b, seed, Math.round(nextChip) + 17, side, sw * 0.20);
-      const w = Math.max(4, sw * (0.12 + Math.abs(jitter(seed, nextChip + 3, 0.08))));
-      const h = Math.max(2, sw * (0.045 + Math.abs(jitter(seed, nextChip + 5, 0.04))));
+    const perpX = Math.cos(angle + Math.PI / 2);
+    const perpY = Math.sin(angle + Math.PI / 2);
+
+    while (nextStamp <= traveled + seg.len && nextStamp <= limit) {
+      const t = (nextStamp - traveled) / seg.len;
+      const cx = seg.a.x + dx * t;
+      const cy = seg.a.y + dy * t;
+
+      const stampW = brushWidth * (1.00 + jitter(seed, stampIdx, 0.18));
+      const stampH = brushWidth * 0.42 * (1.00 + jitter(seed, stampIdx + 50, 0.14));
+      const stampAngle = angle + jitter(seed, stampIdx + 100, 0.22);
+      const offset = jitter(seed, stampIdx + 200, brushWidth * 0.18);
+
+      const px = cx + perpX * offset;
+      const py = cy + perpY * offset;
+
       ctx.save();
-      ctx.translate(chip.x, chip.y);
-      ctx.rotate(angle + jitter(seed, nextChip + 9, 0.9));
-      ctx.fillRect(-w / 2, -h / 2, w, h);
+      ctx.translate(px, py);
+      ctx.rotate(stampAngle);
+      ctx.scale(1, stampH / stampW);
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, stampW);
+      grad.addColorStop(0,    'rgba(0,0,0,0.55)');
+      grad.addColorStop(0.50, 'rgba(0,0,0,0.32)');
+      grad.addColorStop(0.85, 'rgba(0,0,0,0.10)');
+      grad.addColorStop(1,    'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, stampW, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
-      nextChip += spacing + Math.abs(jitter(seed, nextChip + 13, spacing * 0.45));
+
+      nextStamp += spacing;
+      stampIdx += 1;
     }
-    travelled += seg.len;
-    if (travelled > limit) break;
+    traveled += seg.len;
   }
 }
 
@@ -130,5 +164,5 @@ Object.assign(window, {
   hashStreet,
   jitter,
   drawScrapeStroke,
-  drawScratchChips,
+  drawEraserBrush,
 });
