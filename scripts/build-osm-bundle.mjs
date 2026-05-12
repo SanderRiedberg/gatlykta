@@ -11,6 +11,12 @@ const pipelineModule = { exports: {} };
 new Function('module', 'exports', pipelineSrc)(pipelineModule, pipelineModule.exports);
 const { processOverpass } = pipelineModule.exports;
 
+// Load the district polygons the same way; the file just assigns to window.
+const polygonsSrc = await readFile(join(root, 'data/district-polygons.js'), 'utf8');
+const polygonsWindow = {};
+new Function('window', polygonsSrc)(polygonsWindow);
+const DISTRICT_POLYGONS = polygonsWindow.DISTRICT_POLYGONS || {};
+
 const DISTRICTS = [
   { id: 'gamla-stan', bounds: [[59.3215, 18.0610], [59.3290, 18.0810]] },
   { id: 'norrmalm', bounds: [[59.3285, 18.0530], [59.3450, 18.0830]] },
@@ -59,7 +65,7 @@ async function fetchOverpass() {
 }
 
 const json = await fetchOverpass();
-const streets = processOverpass(json, DISTRICTS, { coordPrecision: 7 });
+const streets = processOverpass(json, DISTRICTS, { coordPrecision: 7, polygons: DISTRICT_POLYGONS });
 if (streets.length < 80) throw new Error(`Too few bundled streets: ${streets.length}`);
 
 const generated = new Date().toISOString();

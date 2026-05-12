@@ -100,6 +100,7 @@ function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetSta
 }
 
 function drawDistrictFrames(ctx, districts, activeDistricts, toCanvasPoint, inkColor) {
+  const polygons = window.DISTRICT_POLYGONS || {};
   ctx.save();
   ctx.globalAlpha = 0.18;
   ctx.strokeStyle = inkColor;
@@ -107,6 +108,19 @@ function drawDistrictFrames(ctx, districts, activeDistricts, toCanvasPoint, inkC
   ctx.setLineDash([5, 6]);
   for (const district of districts) {
     if (activeDistricts && !activeDistricts.includes(district.id)) continue;
+    const polygon = polygons[district.id];
+    if (polygon && polygon.length > 2) {
+      ctx.beginPath();
+      const p0 = toCanvasPoint(polygon[0]);
+      ctx.moveTo(p0.x, p0.y);
+      for (let i = 1; i < polygon.length; i++) {
+        const p = toCanvasPoint(polygon[i]);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      continue;
+    }
     const [[bs, bw], [bn, be]] = district.bounds;
     const nw = toCanvasPoint([bn, bw]);
     const ne = toCanvasPoint([bn, be]);

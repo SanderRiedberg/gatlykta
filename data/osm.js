@@ -93,7 +93,7 @@ async function ensureStreets(onProgress) {
     onProgress && onProgress({ stage: 'fetching' });
     const json = await fetchOverpass();
     onProgress && onProgress({ stage: 'processing' });
-    const streets = processOverpass(json, DISTRICTS);
+    const streets = processOverpass(json, DISTRICTS, { polygons: window.DISTRICT_POLYGONS });
     _LOADED = streets;
     saveCachedOSM(streets);
     return streets;

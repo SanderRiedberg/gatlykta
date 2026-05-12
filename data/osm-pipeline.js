@@ -9,13 +9,32 @@
     return latlng[0] >= s && latlng[0] <= n && latlng[1] >= w && latlng[1] <= e;
   }
 
-  // Pick a district id by majority of coordinate hits. Returns null if no
-  // coordinate falls inside any district.
-  function classifyDistrict(coords, districts) {
+  // Ray-casting point-in-polygon. Polygon is [[lat, lng], ...] forming a
+  // closed ring (first === last is fine but not required).
+  function pointInPolygon(point, polygon) {
+    if (!polygon || polygon.length < 3) return false;
+    const x = point[1];
+    const y = point[0];
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][1], yi = polygon[i][0];
+      const xj = polygon[j][1], yj = polygon[j][0];
+      const intersect = ((yi > y) !== (yj > y))
+        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  // Pick a district id by majority of coordinate hits. Uses polygon if
+  // provided in `polygons[district.id]`, otherwise falls back to bounds.
+  function classifyDistrict(coords, districts, polygons) {
     const counts = {};
     for (const c of coords) {
       for (const d of districts) {
-        if (inBounds(c, d.bounds)) { counts[d.id] = (counts[d.id] || 0) + 1; break; }
+        const polygon = polygons && polygons[d.id];
+        const inside = polygon ? pointInPolygon(c, polygon) : inBounds(c, d.bounds);
+        if (inside) { counts[d.id] = (counts[d.id] || 0) + 1; break; }
       }
     }
     let best = null;
@@ -56,6 +75,7 @@
   function processOverpass(json, districts, options = {}) {
     const minLength = options.minLengthMeters != null ? options.minLengthMeters : 60;
     const coordPrecision = options.coordPrecision;
+    const polygons = options.polygons || null;
 
     const ways = (json.elements || []).filter(e =>
       e.type === 'way' && e.geometry && e.tags && e.tags.name);
@@ -67,11 +87,14 @@
         : [g.lat, g.lon]);
 
       // Count district hits across all coordinates of this way. Skip the way
-      // entirely if no coordinate falls in any of our districts.
+      // entirely if no coordinate falls in any of our districts. Uses polygon
+      // containment when polygons are provided, else falls back to bounds.
       const hits = {};
       for (const c of coords) {
         for (const d of districts) {
-          if (inBounds(c, d.bounds)) { hits[d.id] = (hits[d.id] || 0) + 1; break; }
+          const polygon = polygons && polygons[d.id];
+          const inside = polygon ? pointInPolygon(c, polygon) : inBounds(c, d.bounds);
+          if (inside) { hits[d.id] = (hits[d.id] || 0) + 1; break; }
         }
       }
       if (Object.keys(hits).length === 0) continue;
@@ -134,7 +157,7 @@
     });
   }
 
-  const api = { inBounds, classifyDistrict, metersBetween, highwayWeight, processOverpass };
+  const api = { inBounds, pointInPolygon, classifyDistrict, metersBetween, highwayWeight, processOverpass };
   if (typeof window !== 'undefined') Object.assign(window, api);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })();

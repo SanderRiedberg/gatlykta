@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const src = await readFile(join(root, 'data/osm-pipeline.js'), 'utf8');
 const mod = { exports: {} };
 new Function('module', 'exports', src)(mod, mod.exports);
-const { inBounds, classifyDistrict, metersBetween, highwayWeight, processOverpass } = mod.exports;
+const { inBounds, pointInPolygon, classifyDistrict, metersBetween, highwayWeight, processOverpass } = mod.exports;
 
 const DISTRICTS = [
   { id: 'norrmalm', bounds: [[59.3285, 18.0530], [59.3450, 18.0830]] },
@@ -40,6 +40,34 @@ test('classifyDistrict: assigns by majority of hits', () => {
 test('classifyDistrict: returns null when nothing inside any bounds', () => {
   const coords = [[60.0, 20.0], [60.1, 20.1]];
   assert.equal(classifyDistrict(coords, DISTRICTS), null);
+});
+
+// ─────────────── pointInPolygon ───────────────
+const triangle = [[0, 0], [0, 10], [10, 5]]; // lat-lng pairs
+
+test('pointInPolygon: interior point returns true', () => {
+  assert.equal(pointInPolygon([3, 5], triangle), true);
+});
+
+test('pointInPolygon: exterior point returns false', () => {
+  assert.equal(pointInPolygon([20, 20], triangle), false);
+});
+
+test('pointInPolygon: degenerate polygon returns false', () => {
+  assert.equal(pointInPolygon([0, 0], [[0, 0], [1, 1]]), false);
+  assert.equal(pointInPolygon([0, 0], null), false);
+});
+
+// classifyDistrict with a polygon overrides bounds
+test('classifyDistrict: polygon-based classification overrides bounds', () => {
+  // Build a tight polygon for norrmalm that excludes a point still in its bounds.
+  const tightPolygon = [[59.330, 18.060], [59.330, 18.065], [59.335, 18.065], [59.335, 18.060]];
+  const polygons = { norrmalm: tightPolygon };
+  // Point inside tight polygon
+  assert.equal(classifyDistrict([[59.332, 18.062]], DISTRICTS, polygons), 'norrmalm');
+  // Point inside norrmalm bounds but outside the tight polygon — should NOT
+  // be classified as norrmalm (and sodermalm bounds don't include it either).
+  assert.equal(classifyDistrict([[59.340, 18.080]], DISTRICTS, polygons), null);
 });
 
 // ─────────────── metersBetween ───────────────
