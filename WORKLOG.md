@@ -33,6 +33,13 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (modes.jsx split)
+- Delade `modes.jsx` (474 rader) i fem filer under `modes/`: `guess-pop.jsx`, `fill.jsx`, `quiz.jsx`, `time.jsx`, `learn.jsx`.
+- Varje fil är inlindad i en IIFE som destrukturerar sina dependencies från `window` vid load-tid och registrerar sin huvudkomponent via `window.<X>Mode` (eller `window.GuessPop`).
+- `index.html` och `scripts/check-static.mjs` uppdaterade. 16 lokala scripts laddas nu.
+- Ingen logik ändrad; endast strukturell uppdelning.
+- ARCHITECTURE.md uppdaterad. `modes/`-listan tar plats av den gamla `modes.jsx`-raden; "närmaste refactor-mål" tappar modes-split-punkten.
+
 ### 2026-05-12 — Claude (skip Tweaks-panel)
 - Sander valde att skippa Tweaks-panelen (568 rader, ingen synlig användning).
 - `tweaks-panel.jsx` borttagen ur repo, `<script>`-raden borta ur `index.html`.
@@ -62,9 +69,10 @@ Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 
 1. [x] **Enhetstestsvit för `game-utils.jsx`** — levererad 2026-05-12. `scripts/test-game-utils.mjs`, 26 tester, kör med `node scripts/test-game-utils.mjs`. Bygg vidare här när nya spelregler läggs till.
 2. [x] **Lyft OSM-processing till delad modul** — levererad 2026-05-12. `data/osm-pipeline.js` delas mellan live-fetch och bundle-script. 15 enhetstester i `scripts/test-osm-pipeline.mjs`.
-3. **Dela upp `modes.jsx`** (mekanisk, medel storlek). Mål: `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`, `modes/guess-pop.jsx`. Glöm inte att uppdatera `index.html` script-ordningen och `scripts/check-static.mjs` expected-listan.
+3. [x] **Dela upp `modes.jsx`** — levererad 2026-05-12. Fem filer under `modes/`, IIFE-mönster, scriptordning i `index.html` uppdaterad.
 4. **Dela upp `map.jsx`** (stor, högre risk). Mål: `map/leaflet-init.jsx`, `map/street-layers.jsx`, `map/labels.jsx`, `map/scratch-overlay.jsx`. Var försiktig med Leaflet-livscykeln; nuvarande effekter ordnas medvetet.
 5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
+6. **Smoke-test för `?fallback=1`-flödet** (litet, lågrisk). Playwright eller liten browser-headless som startar sidan med `?fallback=1`, klickar genom meny → område → quiz skrivläge, och kontrollerar att inga konsolfel uppstår.
 
 ## Kontaktytor
 

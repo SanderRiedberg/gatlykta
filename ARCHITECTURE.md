@@ -19,7 +19,8 @@ Det är medvetet okej för prototypen, men inför 1.0 bör projektet troligen fl
 - `game-utils.jsx`: fuzzy matching, ledtrådar, svårighet, poäng och rundslumpning.
 - `map-rendering.jsx`: lågnivåhjälpare för kartstil, street widths och scratch-strokes.
 - `map.jsx`: Leaflet-komponenten och dess React-livscykel.
-- `modes.jsx`: nuvarande spellägen. Nästa refactor bör dela upp den filen.
+- `modes/guess-pop.jsx`: delad popover-komponent (input + ledtråd) som Fill och Time använder.
+- `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`: ett spelläge per fil. Var och en lindar sin React-komponent i en IIFE och exponerar via `window.<Mode>Mode`.
 - `screens.jsx`: meny, områdesval, resultat, loading och error.
 - `data/map.js`: legacy/stiliserad karta för äldre experiment, inte source of truth.
 
@@ -29,6 +30,5 @@ OSM-geometri är facit för gatans läge, form och klickyta. All handritad eller
 
 ## Närmaste refactor-mål
 
-- Dela `modes.jsx` i `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx` och `modes/guess-pop.jsx`.
 - Dela `map.jsx` i hook/komponenter för map init, street layers, labels och scratch overlay.
 - Inför ett minimalt smoke-test för `?fallback=1`, startvy, områdesval och quiz skrivläge.

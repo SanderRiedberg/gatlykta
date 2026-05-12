@@ -29,6 +29,11 @@ for (const expected of [
   'data/osm.js',
   'map-rendering.jsx',
   'map.jsx',
+  'modes/guess-pop.jsx',
+  'modes/fill.jsx',
+  'modes/quiz.jsx',
+  'modes/time.jsx',
+  'modes/learn.jsx',
 ]) {
   if (!localScripts.includes(expected)) {
     fail(`index.html no longer loads expected script: ${expected}`);
