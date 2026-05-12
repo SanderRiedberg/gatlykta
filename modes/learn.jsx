@@ -9,7 +9,7 @@
     LeafletMap,
   } = window;
 
-  function LearnMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, onFinish, onQuit }) {
+  function LearnMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, lang, onFinish, onQuit }) {
     const active = useM(() => streetsForDistricts(streets, districtIds, difficulty), [streets, districtIds, difficulty]);
     const [hovered, setHovered] = useS(null);
     const [pinned, setPinned] = useS(() => new Set());
@@ -32,7 +32,20 @@
           <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={states} onStreetClick={handleClick} onStreetHover={setHovered} hoveredStreet={hovered} showLabels showStreetLabels showSolvedLabels mapStyle={mapStyle} progress={active.length ? pinned.size/active.length : 0} />
           <div className="learn-panel">
             <div className="eyebrow">{t('mode.learn')}</div>
-            {hovered ? (<><div className="name">{hovered.name}</div><div className="meta">{(DISTRICTS.find(d => d.id === hovered.district) || {}).name}</div></>) : (<><div className="name" style={{ fontSize: 18 }}>{t('app.tap_street')}</div><div className="help">Klicka för att pinna gator du har lärt dig.</div></>)}
+            {hovered ? (
+              <>
+                <div className="name">{hovered.name}</div>
+                <div className="meta">{(DISTRICTS.find(d => d.id === hovered.district) || {}).name}</div>
+                {window.triviaForStreet && window.triviaForStreet(hovered.name, lang || 'sv') && (
+                  <p className="learn-trivia">{window.triviaForStreet(hovered.name, lang || 'sv')}</p>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="name" style={{ fontSize: 18 }}>{t('app.tap_street')}</div>
+                <div className="help">{t('learn.pin_hint')}</div>
+              </>
+            )}
           </div>
         </div>
       </div>

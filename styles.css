@@ -201,6 +201,13 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .learn-panel .name { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-bottom: 6px; }
 .learn-panel .meta { font-size: 12px; color: var(--ink-3); font-family: var(--mono); }
 .learn-panel .help { font-size: 13px; color: var(--ink-3); }
+.learn-panel .learn-trivia { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--paper-line); font-family: var(--serif); font-style: italic; }
+
+.results-trivia { margin-top: 22px; }
+.trivia-card { background: color-mix(in srgb, var(--bg-card) 92%, var(--ink) 8%); border: 1px solid var(--paper-line); border-left: 3px solid var(--accent); border-radius: var(--r); padding: 10px 14px; margin-top: 8px; }
+.trivia-card .trivia-where { font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+.trivia-card p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); font-family: var(--serif); }
+.trivia-card.district { border-left-color: var(--accent-deep); }
 
 .toast { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 600; font-family: var(--mono); font-size: 13px; background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 999px; animation: toastIn .25s ease; }
 .toast.ok { background: var(--ok); } .toast.warn { background: var(--warn); }

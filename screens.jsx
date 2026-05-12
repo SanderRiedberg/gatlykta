@@ -129,7 +129,7 @@ function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, on
 }
 
 // ─────────────── Results ───────────────
-function Results({ t, result, districtIds, streets, difficulty, mapStyle, onPlayAgain, onPickArea, onHome }) {
+function Results({ t, result, districtIds, streets, difficulty, mapStyle, lang, onPlayAgain, onPickArea, onHome }) {
   const stars = useMc(() => calculateStars({ correct: result.correct, total: result.total, timeSec: result.time, mode: result.mode }), [result]);
   const allStreetsActive = useMc(() => {
     if (result.roundIds && result.roundIds.length) {
@@ -204,6 +204,22 @@ function Results({ t, result, districtIds, streets, difficulty, mapStyle, onPlay
     return districtIds.map(id => (DISTRICTS.find(d => d.id === id) || {}).name).filter(Boolean).join(' + ');
   }, [districtIds, t]);
 
+  const triviaItems = useMc(() => {
+    if (!window.triviaForStreet || !window.triviaForDistrict) return { district: null, streets: [] };
+    const lng = lang || 'sv';
+    const single = districtIds && districtIds.length === 1 ? districtIds[0] : null;
+    const districtText = single ? window.triviaForDistrict(single, lng) : null;
+    const districtName = single ? (DISTRICTS.find(d => d.id === single) || {}).name : '';
+    const candidates = (solvedItems.length ? solvedItems : missedItems);
+    const matches = [];
+    for (const s of candidates) {
+      const text = window.triviaForStreet(s.name, lng);
+      if (text) matches.push({ name: s.name, text });
+      if (matches.length >= 3) break;
+    }
+    return { district: districtText, districtName, streets: matches };
+  }, [districtIds, solvedItems, missedItems, lang]);
+
   const [flash, setFlash] = useSc(null);
   const handleShare = useCc(async () => {
     const modeName = t(`mode.${result.mode}`);
@@ -254,6 +270,23 @@ function Results({ t, result, districtIds, streets, difficulty, mapStyle, onPlay
                 {missedItems.map(s => <span key={s.id} className="chip miss">{s.name}</span>)}
               </div>
             </>
+          )}
+          {(triviaItems.district || triviaItems.streets.length > 0) && (
+            <div className="results-trivia">
+              <div className="eyebrow">{t('trivia.heading')}</div>
+              {triviaItems.district && (
+                <div className="trivia-card district">
+                  <div className="trivia-where">{triviaItems.districtName}</div>
+                  <p>{triviaItems.district}</p>
+                </div>
+              )}
+              {triviaItems.streets.map((tr, i) => (
+                <div key={i} className="trivia-card">
+                  <div className="trivia-where">{tr.name}</div>
+                  <p>{tr.text}</p>
+                </div>
+              ))}
+            </div>
           )}
           <div className="actions-row" style={{ marginTop: 28 }}>
             <button className="btn" onClick={onPlayAgain}>↻ {t('results.again')}</button>

@@ -79,11 +79,13 @@ function App() {
     const Mode = { fill: FillMode, quiz: QuizMode, time: TimeMode, learn: LearnMode }[view.modeId];
     return <Mode t={t} streets={streets} districtIds={view.districtIds} focusDistrict={view.focusDistrict}
       difficulty={tweaks.difficulty || 'easy'} mapStyle={tweaks.mapStyle || 'sketch'}
+      lang={tweaks.lang || 'sv'}
       onFinish={finish} onQuit={pickAreaAgain} />;
   }
   if (view.name === 'results') {
     return <Results t={t} result={view.result} districtIds={view.districtIds} streets={streets}
       difficulty={tweaks.difficulty || 'easy'} mapStyle={tweaks.mapStyle || 'sketch'}
+      lang={tweaks.lang || 'sv'}
       onPlayAgain={playAgain} onPickArea={pickAreaAgain} onHome={goMenu} />;
   }
   return null;

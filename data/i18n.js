@@ -140,6 +140,9 @@ const I18N = {
     'tweaks.section.play': 'Spel',
     'tweaks.labels': 'Visa stadsdelsnamn',
     'tweaks.lang': 'Språk',
+
+    'trivia.heading': 'Visste du?',
+    'learn.pin_hint': 'Klicka för att pinna gator du har lärt dig.',
   },
   en: {
     'app.tagline': 'Learn your city, one street at a time.',
@@ -279,6 +282,9 @@ const I18N = {
     'tweaks.section.play': 'Play',
     'tweaks.labels': 'Show district labels',
     'tweaks.lang': 'Language',
+
+    'trivia.heading': 'Did you know?',
+    'learn.pin_hint': 'Click to pin streets you have learned.',
   }
 };
 

@@ -11,6 +11,7 @@ const SUITES = [
   { name: 'static check', script: 'scripts/check-static.mjs' },
   { name: 'game-utils', script: 'scripts/test-game-utils.mjs' },
   { name: 'osm-pipeline', script: 'scripts/test-osm-pipeline.mjs' },
+  { name: 'trivia', script: 'scripts/test-trivia.mjs' },
 ];
 
 function run(script) {

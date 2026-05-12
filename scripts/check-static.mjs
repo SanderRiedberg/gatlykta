@@ -27,6 +27,7 @@ for (const expected of [
   'game-utils.jsx',
   'data/osm-pipeline.js',
   'data/osm.js',
+  'data/trivia.js',
   'map-rendering.jsx',
   'map.jsx',
   'modes/guess-pop.jsx',
