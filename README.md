@@ -30,6 +30,12 @@ Kör enhetstesterna för spelreglerna (fuzzy matching, ledtrådar, poäng, svår
 node scripts/test-game-utils.mjs
 ```
 
+Kör enhetstesterna för OSM-pipelinen (geometri, distriktsklassning, length-filter, weight-upgrade, rank):
+
+```bash
+node scripts/test-osm-pipeline.mjs
+```
+
 ## Publicering
 
 Projektet är statiskt och kan publiceras direkt från repo-roten.

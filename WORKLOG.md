@@ -33,6 +33,14 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (OSM-pipeline dedup)
+- La till `data/osm-pipeline.js` som dual-context modul (browser via `window`, Node via `module.exports`). Innehåller `inBounds`, `classifyDistrict`, `metersBetween`, `highwayWeight` och `processOverpass`.
+- `data/osm.js` slimmad: tar nu in `processOverpass(json, DISTRICTS)` från pipeline-modulen i stället för lokal definition.
+- `scripts/build-osm-bundle.mjs` läser pipeline-modulen via sandbox-eval. Bundle-resultat ska vara byte-stabilt om Overpass returnerar samma JSON.
+- La till `scripts/test-osm-pipeline.mjs` — 15 tester med syntetiska Overpass-svar (grupperning, weight-upgrade, length-filter, rank, distrikt-classification, coordPrecision, immutability).
+- `index.html` laddar `data/osm-pipeline.js` innan `data/osm.js`. `scripts/check-static.mjs` har pipeline-filen i expected-listan.
+- ARCHITECTURE.md uppdaterad med ny filansvarsrad; "närmaste refactor-mål" tappar OSM-dedup-punkten.
+
 ## Öppna frågor (väntar på Sander)
 
 ### Tweaks-panel.jsx framtid
@@ -52,7 +60,7 @@ Skulle spara FCP-kostnad när live-fetch + cache funkar (= normalflödet). Inte 
 Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 
 1. [x] **Enhetstestsvit för `game-utils.jsx`** — levererad 2026-05-12. `scripts/test-game-utils.mjs`, 26 tester, kör med `node scripts/test-game-utils.mjs`. Bygg vidare här när nya spelregler läggs till.
-2. **Lyft OSM-processing till delad modul** (medel storlek, medel risk). Idag duplicerat mellan `data/osm.js` och `scripts/build-osm-bundle.mjs`: `classifyDistrict`, `processOverpass`, weight-mapping, `metersBetween`. Lägg i `data/osm-pipeline.js` som UMD/dual-context modul. Kör `node scripts/build-osm-bundle.mjs` som regressionstest (kräver Overpass-åtkomst, så valbart - alternativt mocka fetch).
+2. [x] **Lyft OSM-processing till delad modul** — levererad 2026-05-12. `data/osm-pipeline.js` delas mellan live-fetch och bundle-script. 15 enhetstester i `scripts/test-osm-pipeline.mjs`.
 3. **Dela upp `modes.jsx`** (mekanisk, medel storlek). Mål: `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`, `modes/guess-pop.jsx`. Glöm inte att uppdatera `index.html` script-ordningen och `scripts/check-static.mjs` expected-listan.
 4. **Dela upp `map.jsx`** (stor, högre risk). Mål: `map/leaflet-init.jsx`, `map/street-layers.jsx`, `map/labels.jsx`, `map/scratch-overlay.jsx`. Var försiktig med Leaflet-livscykeln; nuvarande effekter ordnas medvetet.
 5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.

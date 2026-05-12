@@ -25,6 +25,7 @@ for (const src of localScripts) {
 for (const expected of [
   'data/city-stockholm.js',
   'game-utils.jsx',
+  'data/osm-pipeline.js',
   'data/osm.js',
   'map-rendering.jsx',
   'map.jsx',
