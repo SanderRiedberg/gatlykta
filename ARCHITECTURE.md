@@ -1,5 +1,7 @@
 # Gatlykta architecture
 
+Strukturen för hur filerna hänger ihop. Den långsiktiga visionen ligger i [`ROADMAP.md`](./ROADMAP.md). Pågående arbete och handover mellan utvecklarsessioner ligger i [`WORKLOG.md`](./WORKLOG.md).
+
 ## Runtime
 
 Projektet är fortfarande en statisk webbsida utan buildsteg. `index.html` laddar React, Leaflet och Babel från CDN och sedan appens scripts i beroendeordning.

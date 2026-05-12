@@ -1,5 +1,7 @@
 # Gatlykta roadmap
 
+Den långsiktiga riktningen. Vad som ligger i postlådan just nu (öppna frågor, nästa kandidat-tasks, arbetslogg mellan utvecklarsessioner) ligger i [`WORKLOG.md`](./WORKLOG.md). Filansvar och refactor-mål ligger i [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
 ## Målbild
 
 Gatlykta ska bli ett snyggt, lekfullt webbläsarspel där spelaren lär sig en stad gata för gata. Första versionen fokuserar på Stockholm innanför tullarna, med svenska som standardspråk och engelska som första alternativa språk.
