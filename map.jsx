@@ -197,12 +197,20 @@ function LeafletMap({
     const draw = () => {
       const size = map.getSize();
       const dpr = window.devicePixelRatio || 1;
-      if (canvas.width !== size.x * dpr || canvas.height !== size.y * dpr) {
-        canvas.width = size.x * dpr; canvas.height = size.y * dpr;
-        canvas.style.width = size.x + 'px'; canvas.style.height = size.y + 'px';
+      const padX = size.x;
+      const padY = size.y;
+      const cssW = size.x + padX * 2;
+      const cssH = size.y + padY * 2;
+      if (canvas.width !== cssW * dpr || canvas.height !== cssH * dpr) {
+        canvas.width = cssW * dpr; canvas.height = cssH * dpr;
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
       }
-      L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
+      L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([-padX, -padY]));
       const ctx = canvas.getContext('2d');
+      const toCanvasPoint = (latlng) => {
+        const p = map.latLngToContainerPoint(latlng);
+        return { x: p.x + padX, y: p.y + padY };
+      };
       const p = Math.max(0, Math.min(1, progress || 0));
       const style = {
         sketch:     { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00 },
@@ -213,16 +221,16 @@ function LeafletMap({
       }[mapStyle] || { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00 };
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, size.x, size.y);
+      ctx.clearRect(0, 0, cssW, cssH);
       // Solid paper
       ctx.fillStyle = paperColor();
-      ctx.fillRect(0, 0, size.x, size.y);
+      ctx.fillRect(0, 0, cssW, cssH);
       // Stable paper grain. Avoid Math.random here; redraws happen during map moves.
       ctx.fillStyle = `rgba(0,0,0,${0.02 + 0.025 * style.grain})`;
-      const grainCount = Math.floor(size.x * size.y / (1200 / style.grain));
+      const grainCount = Math.floor(cssW * cssH / (1200 / style.grain));
       for (let i = 0; i < grainCount; i++) {
-        const x = (i * 97 + ((i * 17) % 41)) % size.x;
-        const y = (i * 193 + ((i * 29) % 53)) % size.y;
+        const x = (i * 97 + ((i * 17) % 41)) % cssW;
+        const y = (i * 193 + ((i * 29) % 53)) % cssH;
         ctx.fillRect(x, y, 1, 1);
       }
       // Sketch ALL streets on paper (so user sees street network)
@@ -241,10 +249,10 @@ function LeafletMap({
         for (const way of s.ways) {
           if (way.length < 2) continue;
           ctx.beginPath();
-          const p0 = map.latLngToContainerPoint(way[0]);
+          const p0 = toCanvasPoint(way[0]);
           ctx.moveTo(p0.x, p0.y);
           for (let i = 1; i < way.length; i++) {
-            const p = map.latLngToContainerPoint(way[i]); ctx.lineTo(p.x, p.y);
+            const p = toCanvasPoint(way[i]); ctx.lineTo(p.x, p.y);
           }
           ctx.stroke();
         }
@@ -270,10 +278,10 @@ function LeafletMap({
             for (let r = 0; r < pass.repeats; r++) {
               ctx.beginPath();
               const seed = hashStreet(s.id, r);
-              const p0 = map.latLngToContainerPoint(way[0]);
+              const p0 = toCanvasPoint(way[0]);
               ctx.moveTo(p0.x + jitter(seed, 0, pass.jitter), p0.y + jitter(seed, 1, pass.jitter));
               for (let i = 1; i < way.length; i++) {
-                const pt = map.latLngToContainerPoint(way[i]);
+                const pt = toCanvasPoint(way[i]);
                 ctx.lineTo(pt.x + jitter(seed, i * 2, pass.jitter), pt.y + jitter(seed, i * 2 + 1, pass.jitter));
               }
               ctx.stroke();
@@ -289,8 +297,8 @@ function LeafletMap({
 
     draw();
     const trigger = () => { if (!raf) raf = requestAnimationFrame(() => { raf = null; draw(); }); };
-    map.on('move zoom moveend zoomend resize viewreset', trigger);
-    return () => { try { map.off('move zoom moveend zoomend resize viewreset', trigger); } catch {} if (raf) cancelAnimationFrame(raf); };
+    map.on('drag dragend move zoom moveend zoomend resize viewreset', trigger);
+    return () => { try { map.off('drag dragend move zoom moveend zoomend resize viewreset', trigger); } catch {} if (raf) cancelAnimationFrame(raf); };
   }, [scratch, streetStates, streets, activeDistricts, mapStyle, progress]);
 
   function hashStreet(id, salt = 0) {
