@@ -2,48 +2,78 @@
 
 ## Målbild
 
-Gatlykta ska vara ett snyggt, lekfullt webbläsarspel där spelaren lär sig en stad gata för gata. Första prototypen fokuserar på Stockholm innanför tullarna, med svenska som standardspråk och engelska som första alternativa språk. Spelet ska kännas editorialt: varm pappersbas, kolsvarta gatlinjer och lokal färgreveal när spelaren klarar gator.
+Gatlykta ska bli ett snyggt, lekfullt webbläsarspel där spelaren lär sig en stad gata för gata. Första versionen fokuserar på Stockholm innanför tullarna, med svenska som standardspråk och engelska som första alternativa språk.
 
-## Nuvarande prototyp
+Kärnan är geografisk igenkänning: gatans position, form och sammanhang måste stämma med verkligheten. Visuell stil får vara lekfull, men facitdata och klickytor ska bygga på verklig geometri.
 
-- Fyra grova spellägen finns: Fyll i, Quiz, Tidspress och Lär-läge.
-- Kartan använder Leaflet, satellittiles och OSM-gator som hämtas via Overpass och cacheas i `localStorage`.
-- En lokal fallback-karta med verklig OSM-geometri bundlas i `data/fallback-streets.js` och kan testas med `?fallback=1`.
-- Hard använder hela OSM-urvalet; quizet spelar ett större slumpat delurval per omgång.
-- Stadsdelarna är förenklade bounding boxes för Gamla Stan, Norrmalm, Östermalm, Vasastan, Kungsholmen och Södermalm.
-- Stilväljaren har fem presets: Skiss, Litografi, Cartoon, Minimalism och Pop-art.
-- Progressionen färgar/revealar lokalt längs klarade gator och deras närområde, utan att visa hela satellitbilden direkt.
+## Status nu
 
-## Fas 1: Stabil prototyp
+- Fyra spellägen finns: Fyll i, Quiz, Tidspress och Lär-läge.
+- Kartan kör Leaflet med satellittiles och verkliga OSM-gator.
+- Overpass hämtas live när det går, cacheas i `localStorage` och faller tillbaka på `data/fallback-streets.js`.
+- `?fallback=1` tvingar lokal OSM-bundle och är det bästa testläget för stabil utveckling.
+- Quiz kan köras med tangentbord/diktering eller klick.
+- Fuzzy matching, ledtrådar, facit efter miss och lokal scratch-reveal finns i prototypform.
+- Hard mode använder hela bundlade OSM-urvalet; quiz rundar av till slumpade delomgångar.
+
+## Teknisk riktning
+
+Den viktiga principen framåt:
+
+1. OSM/fallback är source of truth för gator.
+2. City-konfiguration ligger separat från datahämtning.
+3. Spellogik, fuzzy matching och scoring ligger separat från UI.
+4. Kartans visuella renderhjälpare ligger separat från Leaflet-komponenten.
+5. Handritad/stiliserad karta får bara vara dekorativt lager, inte facit eller klickgeometri.
+
+## Fas 0: Städad prototypbas
+
+Målet med fasen är att göra projektet lätt att vidareutveckla utan att ändra spelets känsla.
+
+- Flytta Stockholm-konfiguration till egen fil.
+- Flytta fuzzy matching, hintar, svårighetsfilter, poäng och quiz-slumpning till gemensamma spelhjälpare.
+- Flytta scratch-/kartstilshjälpare ur `map.jsx`.
+- Markera legacy-karta tydligt så den inte blandas ihop med riktig geografi.
+- Dokumentera arkitektur och 1.0-plan.
+- Behåll statisk hosting tills features stabiliserats; ta Vite/byggsteg när behovet av tester och moduler väger tyngre.
+
+## Fas 1: Stabilt spelbar helhet
 
 - Säkerställ att alla fyra spellägen startar, går att spela och kan avslutas.
-- Gör resultatlogiken konsekvent: rätt, missade, visade svar, tid och bästa kombo.
-- Ge varje område stjärnor/medaljer per läge och visa bästa resultat tydligt.
-- Håll lokal fallback på verklig OSM-geometri; handritad geometri får bara användas som dekorativt lager, aldrig som facitdata.
+- Gör resultatlogiken konsekvent: rätt, missade, visade svar, tid, poäng och bästa streak.
+- Inför tydliga slutskärmar per spelläge.
+- Ge varje område medaljer/stjärnor per spelläge och visa bästa resultat.
+- Gör mobil-HUD och områdesval användbara på små skärmar.
 
-## Fas 2: Bättre spelkänsla
+## Fas 2: Game feel
 
-- Fyll i: klicka gata, skriv namn, visa smart feedback och lokal reveal.
-- Quiz: visa gatunamn, klicka rätt gata, ge andra chans innan facit.
-- Tidspress: välj tidsgräns och visa tydlig slutskärm när tiden tar slut.
-- Lär-läge: hover/klick visar namn, stadsdel och möjlighet att markera "kan".
+- Fyll i: bättre popover-position, tydligare fel/ledtråd/facit och mer tillfredsställande reveal.
+- Quiz: tydligt val mellan skrivläge och klickläge, snabbare tempo och bättre feedback vid miss.
+- Tidspress: välj tidsgräns och antal gator, visa tydlig slutskärm när tiden tar slut.
+- Lär-läge: hover/klick visar namn, stadsdel, "kan denna" och enkel repetition.
+- Slumpa fler och smartare rundor så spelet inte känns statiskt.
 
-## Fas 3: Kart- och stilförfining
+## Fas 3: Karta, data och stil
 
-- Bestäm långsiktig kartkälla: OSM/tiles som sann geografi, med handritad stil som visuellt lager ovanpå.
-- Om handritad SVG används: använd den bara som illustration ovanpå verkliga gatsegment och klickytor.
-- Om OSM behålls: förbättra stadsdelsklassning från bounding boxes till polygoner.
-- Koppla varje stilpreset till både tile-filter, pappersstruktur och reveal-bredd.
+- Byt förenklade bounding boxes mot bättre stadsdelspolygoner.
+- Deduplikera uppdelade vägsegment så samma gata känns som en enhet.
+- Förfina click precision och visuella konturer för smala gator.
+- Gör stilarna mer distinkta: Skiss, Litografi, Cartoon, Minimalism och Pop-art ska faktiskt kännas olika.
+- Förbättra scratch-reveal mot mer lottskrap/myntdrag med kantigare, organiska kanter.
+- Utred riktig offline-strategi för tiles om appen ska fungera helt utan nät.
 
-## Fas 4: Språk och fler städer
+## Fas 4: 1.0-produkt
 
-- Behåll alla UI-texter i `data/i18n.js`.
-- Lägg till stadskonfigurationer med egen bbox, centrum, stadsdelar och språkmetadata.
-- Förbered engelskt namn: bra kandidater är `Streetlamp`, `Streetlight`, `Name the Streets` eller mer lekfullt `Streetwise`.
+- City-konfig för fler städer: bbox, centrum, stadsdelar, språkmetadata och data-bundle.
+- Full svensk/engelsk UI via `data/i18n.js`.
+- Delbara resultat och tydlig progress per område.
+- Hosting, domän och enkel publiceringspipeline.
+- Liten testsvit som kör smoke-flöden i browser innan deploy.
 
-## Nästa rimliga steg
+## Nästa bästa steg
 
-1. Göra slutskärmarna mer informativa per spelläge.
-2. Förbättra mobilvyn för områdesval och HUD.
-3. Välja om kartan ska fortsätta med OSM/Leaflet eller byggas om mot handritad SVG för mer exakt visuell kontroll.
-4. Bygga en riktig offline-strategi för tiles om spelet ska fungera utan nät, inte bara utan Overpass.
+1. Slutför städpasset och verifiera att nuvarande spelbeteende fortfarande fungerar.
+2. Dela upp `modes.jsx` i separata mode-filer när första refactorn är grön.
+3. Dela upp `map.jsx` ytterligare i Leaflet-livscykel, street layers, labels och scratch overlay.
+4. Gör en UX-runda på slutskärmar, medaljer och rundinställningar.
+5. Gör ett datapass för stadsdelspolygoner och bättre hantering av segmenterade gator.

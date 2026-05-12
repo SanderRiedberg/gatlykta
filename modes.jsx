@@ -1,12 +1,6 @@
-/* global React, window, DISTRICTS, matchesGuess, evaluateGuess, streetHint */
+/* global React, window, DISTRICTS, matchesGuess, evaluateGuess, streetHint, streetsForDistricts, pointsForGuess, shuffleStreets, quizRoundSize */
 // Gatlykta — game modes. Map data passed in via prop `streets` (loaded OSM).
 const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM, useCallback: useC } = React;
-
-function streetsForDistricts(streets, districtIds, difficulty) {
-  let s = streets;
-  if (districtIds) { const set = new Set(districtIds); s = s.filter(x => set.has(x.district)); }
-  return window.filterByDifficulty ? window.filterByDifficulty(s, difficulty || 'hard') : s;
-}
 
 // ─────────────── Guess popover ───────────────
 function GuessPop({ t, pos, street, wrongCount, hint, onHint, onCorrect, onWrong, onClose, onReveal, inputRef }) {
@@ -37,24 +31,6 @@ function GuessPop({ t, pos, street, wrongCount, hint, onHint, onCorrect, onWrong
       </div>
     </form>
   );
-}
-
-function pointsForGuess({ wrongs = 0, hints = 0, quality = 'exact' }) {
-  return Math.max(35, 100 - wrongs * 15 - hints * 20 - (quality === 'fuzzy' ? 5 : 0));
-}
-
-function shuffleStreets(streets) {
-  const out = [...streets];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-function quizRoundSize(difficulty, total) {
-  const base = difficulty === 'hard' ? 40 : difficulty === 'medium' ? 24 : 14;
-  return Math.min(total, base);
 }
 
 // ════════════════════════════════════════════════════════════════════

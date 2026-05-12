@@ -1,7 +1,7 @@
 /* global React, ReactDOM, window, ensureStreets, makeT, DISTRICTS */
 const { useState: useSa, useEffect: useEa, useMemo: useMa, useCallback: useCa, useRef: useRa } = React;
 
-const TWEAK_DEFAULS = /*EDITMODE-BEGIN*/{
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "paper",
   "lang": "sv",
   "showDistrictLabels": true,
@@ -11,7 +11,7 @@ const TWEAK_DEFAULS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 function App() {
-  const [tweaks, setTweak] = useTweaks ? useTweaks(TWEAK_DEFAULS) : [TWEAK_DEFAULS, () => {}];
+  const [tweaks, setTweak] = useTweaks ? useTweaks(TWEAK_DEFAULTS) : [TWEAK_DEFAULTS, () => {}];
   const t = useMa(() => makeT(tweaks.lang || 'sv'), [tweaks.lang]);
 
   // Apply theme

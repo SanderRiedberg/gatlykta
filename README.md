@@ -18,6 +18,12 @@ För att tvinga den bundlade OSM-kartan i stället för livehämtning från Over
 http://127.0.0.1:8765/?fallback=1
 ```
 
+Kör en snabb statisk sanity-check:
+
+```bash
+node scripts/check-static.mjs
+```
+
 ## Publicering
 
 Projektet är statiskt och kan publiceras direkt från repo-roten.

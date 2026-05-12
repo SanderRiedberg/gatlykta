@@ -1,4 +1,8 @@
 /* global window */
+// Legacy experiment: stylized, non-geographic SVG map.
+// The live app uses OSM geometry from `data/osm.js` and `data/fallback-streets.js`
+// as source of truth. Keep this file only for `v1 sketched.html` and future
+// decorative overlay experiments.
 // Gatlykta — stiliserad SVG-karta över Stockholms innerstad.
 // ViewBox: 1600 × 1100. Inte geografiskt exakt — abstraherad form som
 // fångar de stora dragen (Mälaren/Strömmen/Saltsjön, Gamla Stan-ön,
