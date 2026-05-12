@@ -42,6 +42,12 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-12 — Claude (Results-skärm + trivia + parallellgators-feedback)
+Polish triggered by Sander's live testing:
+- Results-skärmen var glesare än den borde: grand reveal-kaskad där streets unscratch:as i sekvens, count-up-animation på stat-siffror, separata solved/missed-listor, "Annat spelläge"-knapp och Web Share API + clipboard-fallback (`cb9cb13`).
+- Trivia om Stockholm: 6 stadsdelar och 29 gator handkurerade i `data/trivia.js` (sv + en). Visas i Lär-läge under hovered gata och i Results "Visste du?"-sektion. 12 tester i `scripts/test-trivia.mjs` (`1c86416`).
+- "Du tänkte på X"-feedback: när en gissning matchar en annan riktig gata (parallellgators-förvirring), visa "Du tänkte på {name}. Försök igen" istället för generisk "fel". Funkar i Fill, Quiz typed och Quiz click. 5 tester för `findGuessedStreet` (`ff7bad5`).
+
 ### 2026-05-12 — Claude (OSM pipeline merge + orienteringshint)
 - Strandvägen kom som två frågor i Quiz: OSM:s ways för en gata som korsar district-bounds blev två separata entities (`norrmalm::strandvägen` + `ostermalm::strandvägen`). `processOverpass` grupperar nu by name only och bestämmer primärt district by majoritet av way-points. Bundle regenererad: 933 streets (-43 = duplikaterna borta). +1 test för cross-district-fallet (`23932b9`).
 - Paper-vyn var svår att orientera sig på (bara ett "streck"): lägg in svaga streckade rektangel-ramar per active district med alpha 0.18, under streetskissen. Ingen kustlinje eller geometri avslöjas (`8623d76`).
