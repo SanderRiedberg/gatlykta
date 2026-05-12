@@ -227,7 +227,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .results-streets .chip.ok { color: var(--accent-deep); border-color: var(--accent-soft); }
 .results-streets .chip.miss { color: var(--ink-faint); }
 .results-right { background: var(--bg-card); border: 1px solid var(--paper-line); border-radius: var(--r-xl); padding: 16px; display: flex; flex-direction: column; min-height: 420px; }
-.results-right .map-preview { flex: 1; min-height: 360px; border-radius: var(--r-lg); overflow: hidden; }
+.results-right .map-preview { flex: 1; min-height: 360px; border-radius: var(--r-lg); overflow: hidden; position: relative; }
 .actions-row { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
 .divider { height: 1px; background: var(--paper-line); margin: 24px 0; }
 .kbd { display: inline-block; font-family: var(--mono); font-size: 11px; background: var(--bg-card); border: 1px solid var(--paper-line); border-bottom-width: 2px; padding: 2px 6px; border-radius: 4px; color: var(--ink-2); }

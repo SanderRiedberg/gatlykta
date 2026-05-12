@@ -61,3 +61,47 @@ test('fallback flow: menu → area → fill mode opens a guess popover', async (
   const real = errors.filter(e => !/Babel|babel/i.test(e));
   expect(real, `unexpected console/page errors:\n${real.join('\n')}`).toEqual([]);
 });
+
+test('fallback flow: learn mode can finish to results with trivia and share', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+  page.on('console', msg => {
+    if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
+  });
+
+  await page.addInitScript(() => {
+    window.__sharedText = '';
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async text => {
+          window.__sharedText = text;
+        },
+      },
+      configurable: true,
+    });
+  });
+
+  await page.goto('/?fallback=1');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 10000 });
+
+  await page.getByRole('button', { name: /Lär/ }).first().click();
+  await expect(page.getByText('Välj område')).toBeVisible();
+  await page.getByRole('button', { name: /Gamla Stan/ }).first().click();
+  await page.getByRole('button', { name: /Spela Gamla Stan/ }).click();
+
+  await expect(page.locator('.game-hud')).toBeVisible({ timeout: 5000 });
+  await page.getByRole('button', { name: /Avsluta/ }).last().click();
+
+  await expect(page.locator('.results-page')).toBeVisible({ timeout: 5000 });
+  await expect(page.getByText('Visste du?')).toBeVisible();
+  await expect(page.locator('.trivia-card.district')).toContainText('Gamla Stan');
+
+  await page.getByRole('button', { name: /Dela/ }).click();
+  await expect(page.getByText('Kopierat till urklipp')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__sharedText)).toContain('Gatlykta');
+  await expect.poll(() => page.evaluate(() => window.__sharedText)).toContain('Gamla Stan');
+
+  const real = errors.filter(e => !/Babel|babel/i.test(e));
+  expect(real, `unexpected console/page errors:\n${real.join('\n')}`).toEqual([]);
+});

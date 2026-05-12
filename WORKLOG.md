@@ -54,6 +54,12 @@ Polish triggered by Sander's live testing:
 - `map.jsx` är nu en tunn React-wrapper som bara kopplar effekter till helper-filerna.
 - `index.html`, `scripts/check-static.mjs` och `ARCHITECTURE.md` uppdaterade för den nya strukturen.
 
+### 2026-05-12 — Codex (e2e results pass)
+- Utökade `e2e/smoke.spec.mjs` med ett tredje fallback-test: meny → Gamla Stan → Lär-läge → Results.
+- Testet verifierar att Results renderas, att "Visste du?"-trivia visas för stadsdelen och att Dela-knappen skriver en resultattext till clipboard-fallbacken.
+- Testet hittade en layoutbugg: Results-map preview saknade `position: relative`, så `.leaflet-host` kunde täcka hela viewporten och fånga klick på action-knappar. Fixat i `styles.css`.
+- Det täcker nu den nyligen byggda Results/Trivia/Share-ytan utan att kräva live-Overpass eller browser permissions.
+
 ### 2026-05-12 — Claude (OSM pipeline merge + orienteringshint)
 - Strandvägen kom som två frågor i Quiz: OSM:s ways för en gata som korsar district-bounds blev två separata entities (`norrmalm::strandvägen` + `ostermalm::strandvägen`). `processOverpass` grupperar nu by name only och bestämmer primärt district by majoritet av way-points. Bundle regenererad: 933 streets (-43 = duplikaterna borta). +1 test för cross-district-fallet (`23932b9`).
 - Paper-vyn var svår att orientera sig på (bara ett "streck"): lägg in svaga streckade rektangel-ramar per active district med alpha 0.18, under streetskissen. Ingen kustlinje eller geometri avslöjas (`8623d76`).
@@ -108,8 +114,8 @@ Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 2. [x] **Lyft OSM-processing till delad modul** — levererad 2026-05-12. `data/osm-pipeline.js` delas mellan live-fetch och bundle-script. 15 enhetstester i `scripts/test-osm-pipeline.mjs`.
 3. [x] **Dela upp `modes.jsx`** — levererad 2026-05-12. Fem filer under `modes/`, IIFE-mönster, scriptordning i `index.html` uppdaterad.
 4. [x] **Dela upp `map.jsx`** — levererad 2026-05-12. `map.jsx` är tunn wrapper; helpers finns i `map/leaflet-core.jsx`, `map/street-layers.jsx`, `map/scratch-overlay.jsx`, `map/labels.jsx`.
-5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
-6. [x] **Smoke-test för `?fallback=1`-flödet** — levererad 2026-05-12. `e2e/smoke.spec.mjs` via Playwright. Bygg vidare här när nya spelflöden behöver täckning.
+5. [x] **Smoke-test för `?fallback=1`-flödet** — levererad 2026-05-12 och utökad med Results/Trivia/Share 2026-05-12. `e2e/smoke.spec.mjs` via Playwright. Bygg vidare här när nya spelflöden behöver täckning.
+6. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
 
 ## Kontaktytor
 

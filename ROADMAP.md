@@ -77,5 +77,5 @@ Målet med fasen är att göra projektet lätt att vidareutveckla utan att ändr
 1. Slutför städpasset och verifiera att nuvarande spelbeteende fortfarande fungerar.
 2. Gör ett datapass för stadsdelspolygoner och bättre hantering av områdesklassning.
 3. Gör en UX-runda på rundinställningar, medaljer och replay-loop.
-4. Utöka smoke-testet med Results/Share/Trivia när den ytan stabiliserats.
+4. Bygg vidare Playwright-smoken när fler verkliga spelvarv stabiliseras; Results/Share/Trivia täcks nu i fallback-läget.
 5. Planera Vite/ES-moduler först när statisk scriptordning blir ett verkligt hinder.
