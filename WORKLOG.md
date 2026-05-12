@@ -33,6 +33,10 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (test-all runner)
+- La till `scripts/test-all.mjs` som kör `check-static`, `test-game-utils` och `test-osm-pipeline` i sekvens. Exit-code är icke-noll om någon misslyckas.
+- README uppdaterad med körinstruktion. Använd `node scripts/test-all.mjs` som en-knapps-verifiering före commit.
+
 ### 2026-05-12 — Claude (modes.jsx split)
 - Delade `modes.jsx` (474 rader) i fem filer under `modes/`: `guess-pop.jsx`, `fill.jsx`, `quiz.jsx`, `time.jsx`, `learn.jsx`.
 - Varje fil är inlindad i en IIFE som destrukturerar sina dependencies från `window` vid load-tid och registrerar sin huvudkomponent via `window.<X>Mode` (eller `window.GuessPop`).
@@ -90,6 +94,6 @@ Vilka filer hör ihop. Två agenter som båda rör samma rad är en merge-konfli
 ## Konventioner
 
 - Commits: conventional commits format (`fix:`, `refactor:`, `docs:`, `feat:`). Två rader: titel + körkort beskrivning i body.
-- Verifiering före commit: `node scripts/check-static.mjs` ska passera. När det finns enhetstester ska de också passera.
+- Verifiering före commit: `node scripts/test-all.mjs` ska passera. Det kör check-static + alla enhetstester.
 - Stora refactors: gör ett pass per commit. Inte städ + ny funktion i samma commit.
 - ROADMAP är långsiktig. Denna fil är operativ. ARCHITECTURE är strukturell.

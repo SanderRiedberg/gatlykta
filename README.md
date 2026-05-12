@@ -36,6 +36,12 @@ Kör enhetstesterna för OSM-pipelinen (geometri, distriktsklassning, length-fil
 node scripts/test-osm-pipeline.mjs
 ```
 
+Eller kör allt på en gång:
+
+```bash
+node scripts/test-all.mjs
+```
+
 ## Publicering
 
 Projektet är statiskt och kan publiceras direkt från repo-roten.
