@@ -2,6 +2,8 @@
 
 Gatlykta är en webbläsarprototyp för att lära sig gatunamn i Stockholm innanför tullarna. Spelaren klickar gator, gissar namn och skrapar fram kartan lokalt allt eftersom gator klaras.
 
+Quizläget kan köras utan musklick: appen markerar en gata, spelaren skriver eller dikterar namnet och trycker Enter. Det går även att växla till klick-quiz.
+
 ## Kör lokalt
 
 ```bash

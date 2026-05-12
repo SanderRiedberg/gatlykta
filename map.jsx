@@ -164,6 +164,8 @@ function LeafletMap({
           line.setStyle({ color: 'var(--solved-ink)', weight: Math.max(line.options.weight, widthBase(line)), opacity: 0.58 });
         } else if (state === 'selected') {
           line.setStyle({ color: 'var(--selected-ink)', weight: widthBase(line) + 1.4, opacity: 0.84 });
+        } else if (state === 'target') {
+          line.setStyle({ color: 'var(--selected-ink)', weight: widthBase(line) + 2.2, opacity: 0.92, dashArray: '8 7' });
         } else if (state === 'hinted') {
           line.setStyle({ color: 'var(--warn)', weight: line.options.weight + 0.5, dashArray: '4 6' });
         } else if (state === 'wrong') {
