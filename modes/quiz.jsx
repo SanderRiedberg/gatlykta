@@ -106,7 +106,11 @@
 
     const handleTypedSubmit = useC((event) => {
       event && event.preventDefault();
-      if (!target || !answer.trim()) return;
+      if (!target) return;
+      if (!answer.trim()) {
+        missTarget();
+        return;
+      }
       const result = evaluateGuess ? evaluateGuess(target, answer) : { accepted: matchesGuess(target, answer), quality: 'exact' };
       if (result.accepted) {
         completeTarget(result);
@@ -116,7 +120,7 @@
         setAnswer('');
         registerWrongTarget();
       }
-    }, [target, answer, completeTarget, registerWrongTarget]);
+    }, [target, answer, completeTarget, registerWrongTarget, missTarget]);
 
     const toggleDictation = useC(() => {
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -181,7 +185,7 @@
                       placeholder={t('quiz.type_placeholder')} aria-label={t('quiz.answer_label')}
                       spellCheck={false} autoComplete="off" />
                     {canDictate && <button type="button" className={`btn ghost small mic ${listening ? 'on' : ''}`} onClick={toggleDictation} title={t('quiz.dictate_title')}>{listening ? t('quiz.listening') : t('quiz.dictate')}</button>}
-                    <button type="submit" className="btn small" disabled={!answer.trim()}>↵</button>
+                    <button type="submit" className="btn small" title={answer.trim() ? t('quiz.submit_title') : t('quiz.skip_title')}>↵</button>
                   </div>
                   <div className="quiz-help">{tries ? t('quiz.try_hint') : t('quiz.type_help')}</div>
                 </form>

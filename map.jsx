@@ -162,7 +162,7 @@ function LeafletMap({
         } else if (state === 'selected') {
           line.setStyle({ color: 'var(--selected-ink)', weight: widthBase(line) + 1.4, opacity: 0.84 });
         } else if (state === 'target') {
-          line.setStyle({ color: 'var(--selected-ink)', weight: widthBase(line) + 2.2, opacity: 0.92, dashArray: '8 7' });
+          line.setStyle({ color: 'var(--target-ink)', weight: widthBase(line) + 3.6, opacity: 1.0, dashArray: null });
         } else if (state === 'hinted') {
           line.setStyle({ color: 'var(--warn)', weight: line.options.weight + 0.5, dashArray: '4 6' });
         } else if (state === 'wrong') {

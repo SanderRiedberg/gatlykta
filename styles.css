@@ -20,6 +20,7 @@
   --selected-ink:  oklch(0.20 0.012 60);
   --solved-ink:    oklch(0.43 0.075 165);
   --solved-soft:   oklch(0.90 0.045 155);
+  --target-ink:    oklch(0.58 0.20 142);
   --ok:           oklch(0.55 0.13 145);
   --warn:         oklch(0.60 0.16 35);
 
@@ -47,6 +48,7 @@
   --selected-ink: oklch(0.95 0.01 80);
   --solved-ink: oklch(0.70 0.10 160);
   --solved-soft: oklch(0.31 0.04 160);
+  --target-ink: oklch(0.78 0.22 148);
 }
 
 * { box-sizing: border-box; }
@@ -150,7 +152,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .scratch-overlay svg path { transition: stroke-width 0.6s ease; }
 
 .street-line { transition: opacity 0.3s ease; }
-.street-line.state-target { stroke-dasharray: 8 7; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--selected-ink) 34%, transparent)); }
+.street-line.state-target { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--target-ink) 70%, transparent)) drop-shadow(0 0 2px var(--target-ink)); }
 
 /* Labels (HTML markers) */
 .district-leaflet-label {
