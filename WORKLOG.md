@@ -33,6 +33,13 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (skip Tweaks-panel)
+- Sander valde att skippa Tweaks-panelen (568 rader, ingen synlig användning).
+- `tweaks-panel.jsx` borttagen ur repo, `<script>`-raden borta ur `index.html`.
+- `useTweaks` ersatt med en ~20 rader localStorage-hook direkt i `app.jsx`. Storage-nyckel: `gatlykta.tweaks.v1`.
+- `TWEAK_DEFAULTS` rensade från `scratch` och `showDistrictLabels` (de skickades aldrig vidare till `LeafletMap`). `theme`, `lang`, `difficulty`, `mapStyle` är kvar — de används.
+- `/*EDITMODE-BEGIN*/`-markörerna borta eftersom edit-mode-protokollet hörde till panelen.
+
 ### 2026-05-12 — Claude (OSM-pipeline dedup)
 - La till `data/osm-pipeline.js` som dual-context modul (browser via `window`, Node via `module.exports`). Innehåller `inBounds`, `classifyDistrict`, `metersBetween`, `highwayWeight` och `processOverpass`.
 - `data/osm.js` slimmad: tar nu in `processOverpass(json, DISTRICTS)` från pipeline-modulen i stället för lokal definition.
@@ -43,17 +50,11 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 
 ## Öppna frågor (väntar på Sander)
 
-### Tweaks-panel.jsx framtid
-`tweaks-panel.jsx` är 568 rader. `useTweaks` används för `theme/lang/difficulty/mapStyle`, men ingen `<TweaksPanel>` renderas i app:en, och `TWEAK_DEFAULTS.scratch` + `TWEAK_DEFAULTS.showDistrictLabels` passas aldrig vidare till `LeafletMap`. Två val:
-
-- **Aktivera UI:** rendera en knapp/handtag som öppnar panelen, wira in `scratch` + `showDistrictLabels` som props till `LeafletMap`.
-- **Stryk filen:** ersätt `useTweaks` med en ~30 rader localStorage-hook och plocka bort `tweaks-panel.jsx` ur `index.html`.
-
 ### Vite/byggsteg
-Inte nu, men trigger är en av: enhetstester utöver `game-utils.jsx`, linting, TypeScript, eller modul-import. Flagga när någon blir aktuell.
+Sander har inte tagit ställning till Vite men sagt "bygg långsiktigt hållbart". Triggers att fundera på det igen: enhetstester utöver Node-sandboxen (UI-tester via Vitest + jsdom), linting, TypeScript, eller riktiga ES-moduler. Inte nu.
 
 ### Lazy-load av fallback-streets.js (807 KB)
-Skulle spara FCP-kostnad när live-fetch + cache funkar (= normalflödet). Inte kritiskt nu, men på listan om vi vill polera laddningstid.
+Förklarat 2026-05-12: bundeln laddas idag inline även när Overpass-fetch eller cache funkar (90% av sidvisningar). Lazy-load skulle dynamiskt injicera scripten bara när bundeln behövs. Vinst: ~800 KB nedladdning + parsetid sparat per normal sidvisning, märkbart på långsam mobil. Kostnad: aningen mer komplex laddningslogik; cold-start utan nät blir minimalt långsammare. Sander har skjutit upp beslutet — sätts på listan inför 1.0-polering.
 
 ## Nästa kandidat-tasks
 
@@ -74,7 +75,7 @@ Vilka filer hör ihop. Två agenter som båda rör samma rad är en merge-konfli
 | OSM-data + bundeln | `data/osm.js`, `scripts/build-osm-bundle.mjs`, `data/fallback-streets.js` |
 | Spelregler och matchning | `game-utils.jsx`, `modes.jsx` |
 | Karta + rendering | `map.jsx`, `map-rendering.jsx`, `styles.css` |
-| Skärmar och layout | `screens.jsx`, `components.jsx`, `tweaks-panel.jsx` |
+| Skärmar och layout | `screens.jsx`, `components.jsx` |
 | Konfiguration och i18n | `data/city-stockholm.js`, `data/i18n.js`, `app.jsx` |
 | Legacy (decorative only) | `data/map.js`, `v1 sketched.html` |
 

@@ -1,14 +1,32 @@
 /* global React, ReactDOM, window, ensureStreets, makeT, DISTRICTS */
 const { useState: useSa, useEffect: useEa, useMemo: useMa, useCallback: useCa, useRef: useRa } = React;
 
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "theme": "paper",
-  "lang": "sv",
-  "showDistrictLabels": true,
-  "scratch": true,
-  "difficulty": "easy",
-  "mapStyle": "sketch"
-}/*EDITMODE-END*/;
+const TWEAK_DEFAULTS = {
+  theme: 'paper',
+  lang: 'sv',
+  difficulty: 'easy',
+  mapStyle: 'sketch',
+};
+
+const TWEAKS_STORAGE_KEY = 'gatlykta.tweaks.v1';
+
+function useTweaks(defaults) {
+  const [edits, setEdits] = useSa(() => {
+    try {
+      const stored = localStorage.getItem(TWEAKS_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch { return {}; }
+  });
+  const tweaks = useMa(() => ({ ...defaults, ...edits }), [edits]);
+  const setTweak = useCa((key, value) => {
+    setEdits(prev => {
+      const next = { ...prev, [key]: value };
+      try { localStorage.setItem(TWEAKS_STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+  return [tweaks, setTweak];
+}
 
 function App() {
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
