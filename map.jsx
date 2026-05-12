@@ -213,12 +213,12 @@ function LeafletMap({
       };
       const p = Math.max(0, Math.min(1, progress || 0));
       const style = {
-        sketch:     { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00 },
-        lithograph: { grain: 1.35, lineAlpha: 0.72, lineScale: 0.92, block: 1.20 },
-        cartoon:    { grain: 0.55, lineAlpha: 0.84, lineScale: 1.12, block: 1.12 },
-        minimalism: { grain: 0.35, lineAlpha: 0.55, lineScale: 0.72, block: 0.85 },
-        popart:     { grain: 0.75, lineAlpha: 0.88, lineScale: 1.18, block: 1.28 },
-      }[mapStyle] || { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00 };
+        sketch:     { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00, outline: false },
+        lithograph: { grain: 1.55, lineAlpha: 0.70, lineScale: 0.88, block: 1.12, outline: false },
+        cartoon:    { grain: 0.22, lineAlpha: 0.96, lineScale: 1.46, block: 1.05, outline: true },
+        minimalism: { grain: 0.25, lineAlpha: 0.46, lineScale: 0.68, block: 0.82, outline: false },
+        popart:     { grain: 0.62, lineAlpha: 0.92, lineScale: 1.24, block: 1.18, outline: true },
+      }[mapStyle] || { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00, outline: false };
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cssW, cssH);
@@ -237,24 +237,31 @@ function LeafletMap({
       ctx.globalCompositeOperation = 'source-over';
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       const z = map.getZoom();
+      const strokeWay = (way, width, color, alpha) => {
+        if (way.length < 2) return;
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        const p0 = toCanvasPoint(way[0]);
+        ctx.moveTo(p0.x, p0.y);
+        for (let i = 1; i < way.length; i++) {
+          const pt = toCanvasPoint(way[i]);
+          ctx.lineTo(pt.x, pt.y);
+        }
+        ctx.stroke();
+      };
       for (const s of streets) {
         if (activeDistricts && !activeDistricts.includes(s.district)) continue;
         const state = streetStates[s.id] || 'idle';
         // Solved streets we don't sketch — they'll be punched out
         if (state === 'solved' && (reveals[s.id] || 0) >= 1) continue;
-        ctx.strokeStyle = inkColor();
-        ctx.globalAlpha = (state === 'idle' ? style.lineAlpha : 0.55) * (0.9 + p * 0.1);
+        const alpha = (state === 'idle' ? style.lineAlpha : 0.55) * (0.9 + p * 0.1);
         const baseW = s.weight === 'thick' ? 3.2 : s.weight === 'medium' ? 2.2 : 1.4;
-        ctx.lineWidth = baseW * style.lineScale * Math.max(0.7, (z - 12) * 0.35);
+        const lineW = baseW * style.lineScale * Math.max(0.7, (z - 12) * 0.35);
         for (const way of s.ways) {
-          if (way.length < 2) continue;
-          ctx.beginPath();
-          const p0 = toCanvasPoint(way[0]);
-          ctx.moveTo(p0.x, p0.y);
-          for (let i = 1; i < way.length; i++) {
-            const p = toCanvasPoint(way[i]); ctx.lineTo(p.x, p.y);
-          }
-          ctx.stroke();
+          if (style.outline) strokeWay(way, lineW + 3.2, 'rgba(255,250,232,0.76)', alpha * 0.68);
+          strokeWay(way, lineW, inkColor(), alpha);
         }
       }
       ctx.globalAlpha = 1;
@@ -264,31 +271,39 @@ function LeafletMap({
       for (const s of streets) {
         if (activeDistricts && !activeDistricts.includes(s.district)) continue;
         if ((streetStates[s.id] || 'idle') !== 'solved') continue;
-        const prog = reveals[s.id] = Math.min(1, (reveals[s.id] || 0) + 0.06);
-        // Reveal through layered irregular strokes: soft wash, scratched edges, clear core.
+        const prog = reveals[s.id] = Math.min(1, (reveals[s.id] || 0) + 0.075);
+        // Reveal like a lottery-ticket scrape: narrow angular strokes, square caps,
+        // and small chipped edges instead of a soft watercolor wash.
         for (const pass of [
-          { width: sw * (2.2 + p * 0.35), alpha: 0.18, repeats: 4, jitter: 13 },
-          { width: sw * 1.25, alpha: 0.38, repeats: 3, jitter: 7 },
-          { width: sw * 0.78, alpha: 0.92, repeats: 1, jitter: 0 },
+          { width: sw * 0.58, alpha: 0.72, repeats: 3, jitter: 5, spread: sw * 0.40, speed: 1.18 },
+          { width: sw * 0.30, alpha: 0.92, repeats: 7, jitter: 10, spread: sw * 0.88, speed: 1.08 },
+          { width: sw * 0.16, alpha: 0.62, repeats: 9, jitter: 17, spread: sw * 1.28, speed: 0.95 },
         ]) {
-          ctx.lineWidth = pass.width * prog;
-          ctx.strokeStyle = `rgba(0,0,0,${pass.alpha * (0.65 + 0.35 * prog)})`;
+          ctx.lineCap = 'butt';
+          ctx.lineJoin = 'miter';
+          ctx.lineWidth = pass.width;
+          ctx.globalAlpha = pass.alpha;
+          ctx.strokeStyle = '#000';
           for (const way of s.ways) {
             if (way.length < 2) continue;
+            const pts = way.map(toCanvasPoint);
             for (let r = 0; r < pass.repeats; r++) {
-              ctx.beginPath();
               const seed = hashStreet(s.id, r);
-              const p0 = toCanvasPoint(way[0]);
-              ctx.moveTo(p0.x + jitter(seed, 0, pass.jitter), p0.y + jitter(seed, 1, pass.jitter));
-              for (let i = 1; i < way.length; i++) {
-                const pt = toCanvasPoint(way[i]);
-                ctx.lineTo(pt.x + jitter(seed, i * 2, pass.jitter), pt.y + jitter(seed, i * 2 + 1, pass.jitter));
-              }
-              ctx.stroke();
+              const laneBase = pass.repeats === 1 ? 0 : (r / (pass.repeats - 1) - 0.5) * pass.spread;
+              const lane = laneBase + jitter(seed, 71, pass.spread * 0.10);
+              const revealProgress = Math.min(1, Math.max(0, prog * pass.speed - r * 0.018));
+              drawScrapeStroke(ctx, pts, revealProgress, seed, pass.width, lane, pass.jitter);
+            }
+            if (prog > 0.18) {
+              ctx.globalAlpha = 0.42;
+              ctx.fillStyle = '#000';
+              drawScratchChips(ctx, pts, Math.min(1, prog * 1.18), hashStreet(s.id, 99), sw);
+              ctx.globalAlpha = pass.alpha;
             }
           }
         }
       }
+      ctx.globalAlpha = 1;
       ctx.restore();
       // Continue animating if anything is still revealing
       const animating = Object.entries(streetStates).some(([id, st]) => st === 'solved' && (reveals[id] || 0) < 1);
@@ -311,6 +326,90 @@ function LeafletMap({
     if (!amount) return 0;
     const x = Math.sin((seed + n * 1013) * 0.0001) * 10000;
     return (x - Math.floor(x) - 0.5) * amount;
+  }
+
+  function offsetPoint(point, prev, next, seed, n, laneOffset, jitterAmount) {
+    const dx = next.x - prev.x;
+    const dy = next.y - prev.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const side = laneOffset + jitter(seed, n, jitterAmount);
+    const along = jitter(seed, n + 211, jitterAmount * 0.35);
+    return {
+      x: point.x + nx * side + ux * along,
+      y: point.y + ny * side + uy * along,
+    };
+  }
+
+  function drawScrapeStroke(ctx, pts, progress, seed, width, laneOffset, jitterAmount) {
+    if (!pts || pts.length < 2 || progress <= 0) return;
+    const segs = [];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const len = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      if (len > 0) { segs.push({ i, len }); total += len; }
+    }
+    if (!total) return;
+
+    const limit = total * Math.max(0, Math.min(1, progress));
+    let travelled = 0;
+    let started = false;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    for (const seg of segs) {
+      if (travelled >= limit) break;
+      const a = pts[seg.i - 1];
+      const b = pts[seg.i];
+      const remaining = limit - travelled;
+      const t = Math.min(1, remaining / seg.len);
+      const end = t >= 1 ? b : { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      const start = offsetPoint(a, a, b, seed, seg.i * 3, laneOffset, jitterAmount);
+      const stop = offsetPoint(end, a, b, seed, seg.i * 3 + 1, laneOffset, jitterAmount);
+      if (!started) { ctx.moveTo(start.x, start.y); started = true; }
+      ctx.lineTo(stop.x, stop.y);
+      travelled += seg.len;
+    }
+    if (started) ctx.stroke();
+  }
+
+  function drawScratchChips(ctx, pts, progress, seed, sw) {
+    if (!pts || pts.length < 2 || progress <= 0) return;
+    let total = 0;
+    const segs = [];
+    for (let i = 1; i < pts.length; i++) {
+      const len = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      if (len > 0) { segs.push({ i, len }); total += len; }
+    }
+    const limit = total * Math.max(0, Math.min(1, progress));
+    const spacing = Math.max(16, sw * 0.62);
+    let nextChip = spacing * 0.45;
+    let travelled = 0;
+    for (const seg of segs) {
+      const a = pts[seg.i - 1];
+      const b = pts[seg.i];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const angle = Math.atan2(dy, dx);
+      while (travelled + seg.len >= nextChip && nextChip <= limit) {
+        const t = (nextChip - travelled) / seg.len;
+        const base = { x: a.x + dx * t, y: a.y + dy * t };
+        const side = jitter(seed, Math.round(nextChip), sw * 0.95);
+        const chip = offsetPoint(base, a, b, seed, Math.round(nextChip) + 17, side, sw * 0.20);
+        const w = Math.max(4, sw * (0.12 + Math.abs(jitter(seed, nextChip + 3, 0.08))));
+        const h = Math.max(2, sw * (0.045 + Math.abs(jitter(seed, nextChip + 5, 0.04))));
+        ctx.save();
+        ctx.translate(chip.x, chip.y);
+        ctx.rotate(angle + jitter(seed, nextChip + 9, 0.9));
+        ctx.fillRect(-w / 2, -h / 2, w, h);
+        ctx.restore();
+        nextChip += spacing + Math.abs(jitter(seed, nextChip + 13, spacing * 0.45));
+      }
+      travelled += seg.len;
+      if (travelled > limit) break;
+    }
   }
 
   // Render labels for solved/hovered streets

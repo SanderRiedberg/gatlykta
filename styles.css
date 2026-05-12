@@ -131,13 +131,18 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 /* MAP STAGE */
 .map-stage { position: relative; width: 100%; height: 100%; min-height: 0; overflow: hidden; background: var(--bg); }
 .leaflet-host { position: absolute; inset: 0; }
+.leaflet-host::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:340; opacity:0; transition: opacity .35s ease; }
 .leaflet-container { background: var(--bg-2); font-family: var(--sans); }
 .leaflet-host .leaflet-tile-pane { transition: filter .35s ease; }
-.leaflet-host[data-map-style="sketch"] .leaflet-tile-pane { filter: grayscale(1) sepia(.16) contrast(1.02) brightness(1.08) saturate(.52); }
-.leaflet-host[data-map-style="lithograph"] .leaflet-tile-pane { filter: grayscale(.82) sepia(.42) contrast(1.22) brightness(1.03) saturate(.58); }
-.leaflet-host[data-map-style="cartoon"] .leaflet-tile-pane { filter: saturate(1.45) contrast(1.15) brightness(1.03); }
-.leaflet-host[data-map-style="minimalism"] .leaflet-tile-pane { filter: grayscale(.65) contrast(.88) brightness(1.15) saturate(.38); }
-.leaflet-host[data-map-style="popart"] .leaflet-tile-pane { filter: saturate(1.9) contrast(1.24) hue-rotate(-10deg) brightness(1.03); }
+.leaflet-host[data-map-style="sketch"] .leaflet-tile-pane { filter: grayscale(1) sepia(.18) contrast(1.08) brightness(1.10) saturate(.42); }
+.leaflet-host[data-map-style="lithograph"] .leaflet-tile-pane { filter: grayscale(.9) sepia(.58) contrast(1.38) brightness(1.02) saturate(.48); }
+.leaflet-host[data-map-style="lithograph"]::after { opacity:.18; background: repeating-linear-gradient(130deg, rgba(45,31,18,.32) 0 1px, transparent 1px 5px); mix-blend-mode:multiply; }
+.leaflet-host[data-map-style="cartoon"] .leaflet-tile-pane { filter: saturate(2.35) contrast(1.62) brightness(1.10) hue-rotate(-8deg); }
+.leaflet-host[data-map-style="cartoon"]::after { opacity:.34; background: linear-gradient(135deg, rgba(255,232,76,.22), rgba(67,204,205,.18) 46%, rgba(244,88,84,.18)); mix-blend-mode:hard-light; }
+.leaflet-host[data-map-style="minimalism"] .leaflet-tile-pane { filter: grayscale(.82) contrast(.72) brightness(1.24) saturate(.22); }
+.leaflet-host[data-map-style="minimalism"]::after { opacity:.22; background: rgba(255,250,240,.55); mix-blend-mode:screen; }
+.leaflet-host[data-map-style="popart"] .leaflet-tile-pane { filter: saturate(2.25) contrast(1.42) hue-rotate(-18deg) brightness(1.06); }
+.leaflet-host[data-map-style="popart"]::after { opacity:.22; background: radial-gradient(circle at 0 0, rgba(20,18,15,.45) 0 1px, transparent 1.4px) 0 0/8px 8px, linear-gradient(135deg, rgba(255,226,72,.16), rgba(239,71,111,.15)); mix-blend-mode:multiply; }
 .leaflet-control-zoom a { background: var(--bg-card) !important; color: var(--ink) !important; border: 1px solid var(--paper-line) !important; }
 .leaflet-control-attribution { font-size: 10px !important; background: rgba(255,255,255,.6) !important; color: var(--ink-3) !important; }
 [data-theme="dark"] .leaflet-control-attribution { background: rgba(0,0,0,.4) !important; }
@@ -236,7 +241,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .style-chip.on .style-swatch { border-color: rgba(255,255,255,.35); }
 .style-swatch.s-sketch { background: linear-gradient(135deg, #f6efe0 0 48%, #222 49% 53%, #f6efe0 54%); }
 .style-swatch.s-lithograph { background: repeating-linear-gradient(135deg, #d8c2a0 0 3px, #6b5640 3px 4px, #efe1c7 4px 8px); }
-.style-swatch.s-cartoon { background: linear-gradient(135deg, #fae7a2, #7fc8c2 48%, #1f1a14 49% 54%, #f47d5b 55%); }
+.style-swatch.s-cartoon { background: linear-gradient(135deg, #ffe756 0 32%, #111 33% 38%, #43cccd 39% 66%, #111 67% 72%, #f45a54 73%); }
 .style-swatch.s-minimalism { background: linear-gradient(135deg, #f7f5ee 0 62%, #9a9488 63% 66%, #e2dfd6 67%); }
 .style-swatch.s-popart { background: radial-gradient(circle at 30% 35%, #ffe45c 0 18%, transparent 19%), linear-gradient(135deg, #ef476f 0 45%, #118ab2 46% 72%, #06d6a0 73%); }
 
