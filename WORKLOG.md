@@ -33,6 +33,19 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (UX/visual polish round 1)
+Triggered by Sander testing live on `?fallback=1`:
+- Quiz target gata var svår att se: lägg in `--target-ink` (grön), ta bort dash, +3.6 vikt, dubbel drop-shadow halo (`07fa723`).
+- Tom Enter i Quiz typed gjorde inget: nu kallar `missTarget` (skip + visa rätt svar). Submit-knappen aktiv även på tomt, title-attr flippar mellan Skicka/Hoppa över (`07fa723`).
+- Wheel-zoom thrashade canvas-rendering: fade canvas till opacity 0 under `zoomstart→zoomend`, droppa `zoom` från continuous listener, kör en enda redraw vid zoomend. Synkron `draw()` före opacity-restore så canvas alltid är repositionerad innan synlig (`fb2e2c4`, `16ecafb`).
+- Skrap-animationen var cartoon-explosion: byt ut 3-pass scrape-strokes + `drawScratchChips` mot `drawEraserBrush` med soft radial-gradient stamps. Mjuka kanter, gradient stamps, små jitter (`16ecafb`).
+- Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
+- Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
+
+### 2026-05-12 — Claude (OSM pipeline merge + orienteringshint)
+- Strandvägen kom som två frågor i Quiz: OSM:s ways för en gata som korsar district-bounds blev två separata entities (`norrmalm::strandvägen` + `ostermalm::strandvägen`). `processOverpass` grupperar nu by name only och bestämmer primärt district by majoritet av way-points. Bundle regenererad: 933 streets (-43 = duplikaterna borta). +1 test för cross-district-fallet (`23932b9`).
+- Paper-vyn var svår att orientera sig på (bara ett "streck"): lägg in svaga streckade rektangel-ramar per active district med alpha 0.18, under streetskissen. Ingen kustlinje eller geometri avslöjas (`8623d76`).
+
 ### 2026-05-12 — Claude (Playwright smoke-test)
 - La till `package.json` med `@playwright/test` som enda devDep. `npm install` + `npx playwright install chromium` engångskostnad.
 - `playwright.config.mjs`: startar `python3 -m http.server 8765` automatiskt via webServer-config, headless Chromium, retain trace + screenshot on failure.
