@@ -4,7 +4,7 @@
 (function () {
   const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM, useCallback: useC } = React;
   const {
-    evaluateGuess, matchesGuess,
+    evaluateGuess, matchesGuess, findGuessedStreet,
     streetsForDistricts, shuffleStreets, quizRoundSize,
     HudPill, Toast, formatTime,
     LeafletMap,
@@ -85,14 +85,14 @@
       setTimeout(() => next(solvedIds, n, bestStreak), 1200);
     }, [target, missedIds, solvedIds, bestStreak, t, next]);
 
-    const registerWrongTarget = useC(() => {
+    const registerWrongTarget = useC((opts = {}) => {
       if (resolvingRef.current) return;
       const nextTries = triesRef.current + 1;
       triesRef.current = nextTries;
       setTries(nextTries);
       setStreak(0);
       if (nextTries >= 2) missTarget();
-      else setFlash({ tone: 'warn', text: t('feedback.try_again') });
+      else if (!opts.suppressFlash) setFlash({ tone: 'warn', text: t('feedback.try_again') });
     }, [missTarget, t]);
 
     const handleClick = useC((street) => {
@@ -100,9 +100,11 @@
       if (street.id === target.id) {
         completeTarget();
       } else {
-        registerWrongTarget();
+        // Click-mode: we know exactly which street the user picked.
+        setFlash({ tone: 'warn', text: t('feedback.wrong_street').replace('{name}', street.name) });
+        registerWrongTarget({ suppressFlash: true });
       }
-    }, [target, answerMode, completeTarget, registerWrongTarget]);
+    }, [target, answerMode, completeTarget, registerWrongTarget, t]);
 
     const handleTypedSubmit = useC((event) => {
       event && event.preventDefault();
@@ -114,13 +116,22 @@
       const result = evaluateGuess ? evaluateGuess(target, answer) : { accepted: matchesGuess(target, answer), quality: 'exact' };
       if (result.accepted) {
         completeTarget(result);
-      } else {
-        setShake(true);
-        setTimeout(() => setShake(false), 350);
-        setAnswer('');
-        registerWrongTarget();
+        return;
       }
-    }, [target, answer, completeTarget, registerWrongTarget, missTarget]);
+      setShake(true);
+      setTimeout(() => setShake(false), 350);
+      // Type-mode: see if the user's text is actually the name of another
+      // real street in the active set (parallel-street confusion).
+      const guessed = findGuessedStreet ? findGuessedStreet(answer, active) : null;
+      if (guessed && guessed.street.id !== target.id) {
+        setFlash({ tone: 'warn', text: t('feedback.wrong_street').replace('{name}', guessed.street.name) });
+        setAnswer('');
+        registerWrongTarget({ suppressFlash: true });
+        return;
+      }
+      setAnswer('');
+      registerWrongTarget();
+    }, [target, answer, active, t, completeTarget, registerWrongTarget, missTarget]);
 
     const toggleDictation = useC(() => {
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;

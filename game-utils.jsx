@@ -136,6 +136,22 @@ function quizRoundSize(difficulty, total) {
   return Math.min(total, base);
 }
 
+// If the user's guess looks like a real street in the active set, return that
+// street so the UI can show "you were thinking of X" rather than just "wrong".
+// Returns null if the guess isn't fuzzy-close to any street in the list.
+function findGuessedStreet(guess, streets) {
+  if (!guess || !guess.trim() || !streets || !streets.length) return null;
+  let best = null;
+  for (const s of streets) {
+    const r = evaluateGuess(s, guess);
+    if (!r.accepted) continue;
+    if (!best || r.distance < best.distance) {
+      best = { street: s, distance: r.distance, quality: r.quality };
+    }
+  }
+  return best;
+}
+
 Object.assign(window, {
   normalizeStreet: normalizeStreetName,
   evaluateGuess,
@@ -147,4 +163,5 @@ Object.assign(window, {
   pointsForGuess,
   shuffleStreets,
   quizRoundSize,
+  findGuessedStreet,
 });

@@ -24,6 +24,7 @@ const {
   shuffleStreets,
   quizRoundSize,
   normalizeStreet,
+  findGuessedStreet,
 } = sandbox.window;
 
 const tests = [];
@@ -184,6 +185,45 @@ test('quizRoundSize: caps each difficulty', () => {
 
 test('quizRoundSize: returns total when smaller than cap', () => {
   assert.equal(quizRoundSize('hard', 8), 8);
+});
+
+// ─────────────── findGuessedStreet ───────────────
+const sodermalmStreets = [
+  { id: 'sod-skanegatan', name: 'Skånegatan', district: 'sodermalm' },
+  { id: 'sod-ostgotagatan', name: 'Östgötagatan', district: 'sodermalm' },
+  { id: 'sod-folkungagatan', name: 'Folkungagatan', district: 'sodermalm' },
+  { id: 'sod-bondegatan', name: 'Bondegatan', district: 'sodermalm' },
+];
+
+test('findGuessedStreet: returns the exact match when guess is correct', () => {
+  const r = findGuessedStreet('Skånegatan', sodermalmStreets);
+  assert.ok(r);
+  assert.equal(r.street.id, 'sod-skanegatan');
+  assert.equal(r.quality, 'exact');
+});
+
+test('findGuessedStreet: returns the fuzzy-close street when guess is near', () => {
+  // "Skånegatn" missing one letter
+  const r = findGuessedStreet('Skånegatn', sodermalmStreets);
+  assert.ok(r);
+  assert.equal(r.street.id, 'sod-skanegatan');
+});
+
+test('findGuessedStreet: distinguishes between parallel streets', () => {
+  // User typed Östgötagatan when target was Skånegatan — UI should know which
+  const r = findGuessedStreet('Östgötagatan', sodermalmStreets);
+  assert.ok(r);
+  assert.equal(r.street.id, 'sod-ostgotagatan');
+});
+
+test('findGuessedStreet: returns null when nothing is fuzzy-close', () => {
+  assert.equal(findGuessedStreet('Drottninggatan', sodermalmStreets), null);
+});
+
+test('findGuessedStreet: handles empty input and empty streets', () => {
+  assert.equal(findGuessedStreet('', sodermalmStreets), null);
+  assert.equal(findGuessedStreet('Skånegatan', []), null);
+  assert.equal(findGuessedStreet('Skånegatan', null), null);
 });
 
 // ─────────────── shuffleStreets ───────────────

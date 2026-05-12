@@ -4,7 +4,7 @@
 (function () {
   const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM, useCallback: useC } = React;
   const {
-    streetHint, streetsForDistricts, pointsForGuess,
+    streetHint, streetsForDistricts, pointsForGuess, findGuessedStreet,
     HudPill, Toast, formatTime,
     LeafletMap, GuessPop,
   } = window;
@@ -72,18 +72,25 @@
       }
     }, [selected, wrongMap, hintMap, points, solvedIds, total, t, onFinish, bestStreak, streak, startTime, revealedIds]);
 
-    const handleWrong = useC(() => {
+    const handleWrong = useC((guess) => {
       if (!selected) return;
       const nextWrong = (wrongMap[selected.street.id] || 0) + 1;
       setWrongMap(m => ({ ...m, [selected.street.id]: nextWrong }));
       setStreak(0);
+      // If the user typed the name of an actual other street nearby (parallel
+      // street, similar name), tell them they were thinking of that one.
+      const guessed = findGuessedStreet ? findGuessedStreet(guess, active) : null;
+      if (guessed && guessed.street.id !== selected.street.id) {
+        setFeedback({ tone: 'warn', text: t('feedback.wrong_street').replace('{name}', guessed.street.name) });
+        return;
+      }
       if (nextWrong >= 2 && !hintMap[selected.street.id]) {
         setHintMap(m => ({ ...m, [selected.street.id]: 1 }));
         setFeedback({ tone: 'warn', text: `${t('app.hint')}: ${streetHint(selected.street, 1)}` });
       } else {
         setFeedback({ tone: 'warn', text: t('feedback.wrong') });
       }
-    }, [selected, wrongMap, hintMap, t]);
+    }, [selected, wrongMap, hintMap, t, active]);
 
     const handleHint = useC(() => {
       if (!selected) return;
