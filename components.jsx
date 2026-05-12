@@ -51,11 +51,15 @@ function HudPill({ k, v, big = false }) {
 
 // ─────────────── Toast ───────────────
 function Toast({ tone = 'default', children, onDone, ttl = 1400 }) {
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
   useEffect(() => {
-    if (!onDone) return;
-    const t = setTimeout(onDone, ttl);
+    if (!onDoneRef.current) return;
+    const t = setTimeout(() => {
+      if (onDoneRef.current) onDoneRef.current();
+    }, ttl);
     return () => clearTimeout(t);
-  }, [onDone, ttl]);
+  }, [children, tone, ttl]);
   return <div className={`toast ${tone}`}>{children}</div>;
 }
 

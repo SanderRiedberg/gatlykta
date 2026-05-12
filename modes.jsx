@@ -184,7 +184,7 @@ function FillMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
             onCorrect={handleCorrect} onWrong={handleWrong}
             onClose={() => { setSelected(null); setPopPos(null); }} onReveal={handleReveal} inputRef={inputRef} />
         )}
-        {feedback && (<Toast key={feedback.text + Math.random()} tone={feedback.tone} onDone={() => setFeedback(null)}>{feedback.text}</Toast>)}
+        {feedback && (<Toast tone={feedback.tone} onDone={() => setFeedback(null)}>{feedback.text}</Toast>)}
       </div>
     </div>
   );
@@ -370,7 +370,7 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
             )}
           </div>
         )}
-        {flash && (<Toast key={flash.text + idx} tone={flash.tone} onDone={() => setFlash(null)} ttl={1100}>{flash.text}</Toast>)}
+        {flash && (<Toast tone={flash.tone} onDone={() => setFlash(null)} ttl={1100}>{flash.text}</Toast>)}
       </div>
     </div>
   );
@@ -455,7 +455,7 @@ function TimeMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
             onClose={() => { setSelected(null); setPopPos(null); }}
             onReveal={() => { setSelected(null); setPopPos(null); }} inputRef={inputRef} />
         )}
-        {feedback && (<Toast key={feedback.text + elapsed} tone={feedback.tone} onDone={() => setFeedback(null)} ttl={900}>{feedback.text}</Toast>)}
+        {feedback && (<Toast tone={feedback.tone} onDone={() => setFeedback(null)} ttl={900}>{feedback.text}</Toast>)}
       </div>
     </div>
   );
