@@ -43,9 +43,11 @@
   }
 
   // Process raw Overpass JSON into Gatlykta street entities.
-  // Each (district, name) becomes one street with grouped way geometries,
-  // a length-derived `weight` upgrade, a stable id and a per-district rank
-  // (0 = longest/most prominent in district).
+  // Each unique `name` becomes one street, even if its ways cross district
+  // bounds (Strandvägen sits on both Norrmalm and Östermalm in OSM). The
+  // primary district is chosen by majority of way-point hits across all
+  // ways for that name. id is `${primaryDistrict}-${slug(name)}`, rank is
+  // per-district (0 = longest/most prominent).
   //
   // Options:
   //   minLengthMeters: drop streets shorter than this (default 60)
@@ -63,35 +65,63 @@
       const coords = w.geometry.map(g => coordPrecision != null
         ? [Number(g.lat.toFixed(coordPrecision)), Number(g.lon.toFixed(coordPrecision))]
         : [g.lat, g.lon]);
-      const district = classifyDistrict(coords, districts);
-      if (!district) continue;
+
+      // Count district hits across all coordinates of this way. Skip the way
+      // entirely if no coordinate falls in any of our districts.
+      const hits = {};
+      for (const c of coords) {
+        for (const d of districts) {
+          if (inBounds(c, d.bounds)) { hits[d.id] = (hits[d.id] || 0) + 1; break; }
+        }
+      }
+      if (Object.keys(hits).length === 0) continue;
+
       const weight = highwayWeight(w.tags.highway);
-      const key = `${district}::${w.tags.name}`;
+      const key = w.tags.name;
       if (!grouped.has(key)) {
         grouped.set(key, {
-          id: key.replace(/[^a-z0-9]+/gi, '-').toLowerCase(),
           name: w.tags.name,
           aliases: [],
-          district,
           weight,
           ways: [],
+          districtHits: {},
         });
       }
       const street = grouped.get(key);
       street.ways.push(coords);
+      for (const [d, n] of Object.entries(hits)) {
+        street.districtHits[d] = (street.districtHits[d] || 0) + n;
+      }
       if (weight === 'thick') street.weight = 'thick';
       else if (weight === 'medium' && street.weight === 'thin') street.weight = 'medium';
     }
 
     const out = [];
     for (const s of grouped.values()) {
+      let primaryDistrict = null;
+      let bestN = 0;
+      for (const [d, n] of Object.entries(s.districtHits)) {
+        if (n > bestN) { primaryDistrict = d; bestN = n; }
+      }
+      if (!primaryDistrict) continue;
+
       let len = 0;
       for (const way of s.ways) {
         for (let i = 1; i < way.length; i++) len += metersBetween(way[i - 1], way[i]);
       }
       const lengthMeters = Math.round(len);
       if (len < minLength) continue;
-      out.push({ ...s, lengthMeters });
+
+      const id = `${primaryDistrict}::${s.name}`.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+      out.push({
+        id,
+        name: s.name,
+        aliases: s.aliases,
+        district: primaryDistrict,
+        weight: s.weight,
+        ways: s.ways,
+        lengthMeters,
+      });
     }
 
     out.sort((a, b) => b.lengthMeters - a.lengthMeters);

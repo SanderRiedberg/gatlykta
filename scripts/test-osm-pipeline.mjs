@@ -81,7 +81,7 @@ function way(id, name, highway, geometry) {
   };
 }
 
-test('processOverpass: groups ways by (district, name)', () => {
+test('processOverpass: groups ways with the same name into one street', () => {
   const json = {
     elements: [
       way(1, 'Sveavägen', 'secondary', norrmalmA),
@@ -92,6 +92,25 @@ test('processOverpass: groups ways by (district, name)', () => {
   assert.equal(out.length, 1);
   assert.equal(out[0].name, 'Sveavägen');
   assert.equal(out[0].ways.length, 2);
+});
+
+test('processOverpass: merges same name across districts into one street', () => {
+  // A street whose ways span Norrmalm and Sodermalm should still be one entry
+  // (Strandvägen real-world case: OSM splits it across district bounds).
+  const norrmalmLong = [];
+  for (let i = 0; i < 20; i++) norrmalmLong.push([59.335 + i * 0.0005, 18.070]);
+  const sodermalmShort = [];
+  for (let i = 0; i < 8; i++) sodermalmShort.push([59.310 + i * 0.0005, 18.070]);
+  const json = {
+    elements: [
+      way(1, 'Långsamma vägen', 'secondary', norrmalmLong),
+      way(2, 'Långsamma vägen', 'secondary', sodermalmShort),
+    ],
+  };
+  const out = processOverpass(json, DISTRICTS);
+  assert.equal(out.length, 1, 'same name across districts must not duplicate');
+  assert.equal(out[0].ways.length, 2);
+  assert.equal(out[0].district, 'norrmalm', 'majority of points fall in norrmalm');
 });
 
 test('processOverpass: weight upgrades from thin to medium when any way is bigger', () => {
