@@ -88,20 +88,31 @@ function drawScrapeStroke(ctx, pts, progress, seed, width, laneOffset, jitterAmo
 // destination-out composite so each stamp punches a soft hole through the
 // paper overlay. Gives a pencil/eraser sweep feel rather than a cartoon scrape.
 //
+// Takes a list of paths (a street can have several OSM ways) and animates a
+// single sweep from one end of the joined sequence to the other rather than
+// filling each sub-way in parallel.
+//
 // - stamps are dense (spacing = brushWidth * 0.22) so coverage is smooth
 // - each stamp uses a radial gradient (soft edge)
 // - the ellipse is rotated along the street direction with small jitter
 // - width and perpendicular offset vary per stamp for handmade feel
-function drawEraserBrush(ctx, pts, progress, seed, brushWidth) {
-  if (!pts || pts.length < 2 || progress <= 0) return;
+function drawEraserBrush(ctx, paths, progress, seed, brushWidth) {
+  if (!paths || progress <= 0) return;
 
+  // Flatten all paths into a single sequence of segments. We keep path order
+  // intact so the sweep travels from the start of the first way to the end of
+  // the last way. Gaps between ways do not get stamps (no bridge), only the
+  // real segments.
   const segs = [];
   let total = 0;
-  for (let i = 1; i < pts.length; i++) {
-    const dx = pts[i].x - pts[i - 1].x;
-    const dy = pts[i].y - pts[i - 1].y;
-    const len = Math.hypot(dx, dy);
-    if (len > 0) { segs.push({ a: pts[i - 1], b: pts[i], len }); total += len; }
+  for (const pts of paths) {
+    if (!pts || pts.length < 2) continue;
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i].x - pts[i - 1].x;
+      const dy = pts[i].y - pts[i - 1].y;
+      const len = Math.hypot(dx, dy);
+      if (len > 0) { segs.push({ a: pts[i - 1], b: pts[i], len }); total += len; }
+    }
   }
   if (!total) return;
 

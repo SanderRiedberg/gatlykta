@@ -262,11 +262,12 @@ function LeafletMap({
         if (activeDistricts && !activeDistricts.includes(s.district)) continue;
         if ((streetStates[s.id] || 'idle') !== 'solved') continue;
         const prog = reveals[s.id] = Math.min(1, (reveals[s.id] || 0) + 0.06);
-        for (const way of s.ways) {
-          if (way.length < 2) continue;
-          const pts = way.map(toCanvasPoint);
-          drawEraserBrush(ctx, pts, prog, hashStreet(s.id), brushWidth);
-        }
+        // Pass all ways together so the sweep animates from one end of the
+        // joined sequence to the other instead of filling each way in parallel.
+        const paths = s.ways
+          .filter(way => way && way.length >= 2)
+          .map(way => way.map(toCanvasPoint));
+        if (paths.length) drawEraserBrush(ctx, paths, prog, hashStreet(s.id), brushWidth);
       }
       ctx.restore();
       // Continue animating if anything is still revealing
