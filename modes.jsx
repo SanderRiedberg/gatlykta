@@ -216,12 +216,13 @@ function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
   const next = useC((solvedSet = solvedIds, missedSet = missedIds, best = bestStreak) => {
     if (idx + 1 >= queue.length) {
       const elapsed = Math.round((Date.now() - startTime) / 1000);
-      onFinish({ mode: 'quiz', total: queue.length, correct: solvedSet.size, missed: queue.length - solvedSet.size, time: elapsed, bestStreak: best, solvedIds: [...solvedSet], revealedIds: [...missedSet] });
+      const roundIds = queue.map(s => s.id);
+      onFinish({ mode: 'quiz', total: queue.length, correct: solvedSet.size, missed: queue.length - solvedSet.size, time: elapsed, bestStreak: best, solvedIds: [...solvedSet], revealedIds: [...missedSet], roundIds });
       return;
     }
     triesRef.current = 0;
     setIdx(i => i + 1); setTries(0); setAnswer('');
-  }, [idx, queue.length, solvedIds, bestStreak, missedIds, startTime, onFinish]);
+  }, [idx, queue, solvedIds, bestStreak, missedIds, startTime, onFinish]);
 
   const completeTarget = useC((match = { quality: 'exact' }) => {
     if (!target || resolvingRef.current) return;

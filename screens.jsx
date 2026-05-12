@@ -132,10 +132,14 @@ function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, on
 function Results({ t, result, districtIds, streets, difficulty, mapStyle, onPlayAgain, onPickArea, onHome }) {
   const stars = useMc(() => calculateStars({ correct: result.correct, total: result.total, timeSec: result.time, mode: result.mode }), [result]);
   const allStreetsActive = useMc(() => {
+    if (result.roundIds && result.roundIds.length) {
+      const byId = new Map(streets.map(s => [s.id, s]));
+      return result.roundIds.map(id => byId.get(id)).filter(Boolean);
+    }
     const set = districtIds ? new Set(districtIds) : null;
     const inDist = streets.filter(s => !set || set.has(s.district));
     return window.filterByDifficulty ? window.filterByDifficulty(inDist, difficulty) : inDist;
-  }, [streets, districtIds, difficulty]);
+  }, [streets, districtIds, difficulty, result]);
   const states = useMc(() => {
     const o = {}; (result.solvedIds || []).forEach(id => o[id] = 'solved'); (result.revealedIds || []).forEach(id => { if (!o[id]) o[id] = 'hinted'; }); return o;
   }, [result]);

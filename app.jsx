@@ -11,7 +11,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 function App() {
-  const [tweaks, setTweak] = useTweaks ? useTweaks(TWEAK_DEFAULTS) : [TWEAK_DEFAULTS, () => {}];
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const t = useMa(() => makeT(tweaks.lang || 'sv'), [tweaks.lang]);
 
   // Apply theme

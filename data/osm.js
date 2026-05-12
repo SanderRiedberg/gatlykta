@@ -34,12 +34,9 @@ function loadCachedOSM() {
     if (!raw) return null;
     const obj = JSON.parse(raw);
     if (!obj.timestamp || (Date.now() - obj.timestamp) > CACHE_TTL) return null;
-    const data = obj.data;
-    if (data && data.length && data[0].rank == null) {
-      const ranks = {};
-      for (const s of data) { s.rank = (ranks[s.district] = (ranks[s.district] || 0)); ranks[s.district]++; }
-    }
-    return data;
+    if (!Array.isArray(obj.data)) return null;
+    if (obj.data.length && obj.data[0].rank == null) return withRanks(obj.data);
+    return obj.data;
   } catch { return null; }
 }
 function saveCachedOSM(data) {
@@ -48,11 +45,11 @@ function saveCachedOSM(data) {
 
 function withRanks(data) {
   const ranks = {};
-  for (const s of data) {
-    if (s.rank == null) s.rank = (ranks[s.district] = (ranks[s.district] || 0));
+  return data.map(s => {
+    const next = s.rank == null ? { ...s, rank: (ranks[s.district] || 0) } : s;
     ranks[s.district] = (ranks[s.district] || 0) + 1;
-  }
-  return data;
+    return next;
+  });
 }
 
 function getFallbackStreets() {

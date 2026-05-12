@@ -87,10 +87,10 @@ function formatTime(secs) {
 function calculateStars({ correct, total, timeSec, mode }) {
   const acc = correct / Math.max(1, total);
   if (mode === 'time') {
-    // Stars in time mode: based on count
-    if (correct >= 18) return 3;
-    if (correct >= 12) return 2;
-    if (correct >= 6) return 1;
+    const ratio = correct / Math.max(1, total);
+    if (correct >= 20 || ratio >= 0.7) return 3;
+    if (correct >= 12 || ratio >= 0.4) return 2;
+    if (correct >= 6 || ratio >= 0.2) return 1;
     return 0;
   }
   if (mode === 'learn') return 3;
