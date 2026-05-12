@@ -222,6 +222,31 @@ function LeafletMap({
         const y = (i * 193 + ((i * 29) % 53)) % cssH;
         ctx.fillRect(x, y, 1, 1);
       }
+      // Faint dashed district frames — just enough orientation to know where
+      // you are without revealing geometry. Drawn under the street sketch so
+      // streets stay the visual focus.
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.strokeStyle = inkColor();
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([5, 6]);
+      for (const d of DISTRICTS) {
+        if (activeDistricts && !activeDistricts.includes(d.id)) continue;
+        const [[bs, bw], [bn, be]] = d.bounds;
+        const nw = toCanvasPoint([bn, bw]);
+        const ne = toCanvasPoint([bn, be]);
+        const sw = toCanvasPoint([bs, bw]);
+        const se = toCanvasPoint([bs, be]);
+        ctx.beginPath();
+        ctx.moveTo(nw.x, nw.y);
+        ctx.lineTo(ne.x, ne.y);
+        ctx.lineTo(se.x, se.y);
+        ctx.lineTo(sw.x, sw.y);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
       // Sketch ALL streets on paper (so user sees street network)
       ctx.globalCompositeOperation = 'source-over';
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
