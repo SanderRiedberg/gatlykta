@@ -42,6 +42,14 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-12 — Claude (screens split + district polygons)
+- Delade `screens.jsx` (341 rader) i fyra filer under `screens/`: `menu.jsx`, `area-select.jsx`, `results.jsx`, `loading.jsx`. Samma IIFE-pattern som `modes/`. `screens/results.jsx` är ~180 rader och håller hela grand-reveal- och trivia-logiken (`650006a`).
+- Datapass: hämtade admin_level=10 boundary relations för 6 stadsdelar från Overpass via nytt `scripts/build-district-polygons.mjs`. Stitchar outer ways till closed rings, decimerar till ~25m spacing, sparar som `data/district-polygons.js` (18-116 punkter per district). Vasastan mappas från OSM:s officiella `Vasastaden` (`9bc835d`).
+- `processOverpass` får `pointInPolygon` (ray casting) och en `polygons`-option. Live fetch och bundle-builder passerar `DISTRICT_POLYGONS`. Polygon vinner över bounds när finns; bounds är fallback (`9bc835d`).
+- Bundle regenererad: 933 → 656 streets. De 277 borttagna var false positives som låg i bounding-rektangelns yttre kanter (Solna, Norra Djurgården, parts of Vasaparken). 12 nyckelgator spot-checkade och finns exakt en gång var (`9bc835d`).
+- `map/scratch-overlay.jsx` `drawDistrictFrames` ritar nu polygon-konturen istället för rektangel när polygon finns. Samma alpha 0.18 och dashed style, mer naturlig form (`9bc835d`).
+- 3 nya pipeline-tester för pointInPolygon och polygon-override av bounds. 4/4 suites + 3/3 e2e gröna.
+
 ### 2026-05-12 — Claude (Results-skärm + trivia + parallellgators-feedback)
 Polish triggered by Sander's live testing:
 - Results-skärmen var glesare än den borde: grand reveal-kaskad där streets unscratch:as i sekvens, count-up-animation på stat-siffror, separata solved/missed-listor, "Annat spelläge"-knapp och Web Share API + clipboard-fallback (`cb9cb13`).
