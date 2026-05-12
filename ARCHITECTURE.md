@@ -29,7 +29,10 @@ Det är medvetet okej för prototypen, men inför 1.0 bör projektet troligen fl
 - `map.jsx`: tunn React-wrapper som kopplar Leaflet-mapens effekter till helper-filerna.
 - `modes/guess-pop.jsx`: delad popover-komponent (input + ledtråd) som Fill och Time använder.
 - `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`: ett spelläge per fil. Var och en lindar sin React-komponent i en IIFE och exponerar via `window.<Mode>Mode`.
-- `screens.jsx`: meny, områdesval, resultat, loading och error.
+- `screens/menu.jsx`: landningsskärm med spellägesval.
+- `screens/area-select.jsx`: områdesval, svårighetsval och kartstilsval.
+- `screens/results.jsx`: slutskärm med grand reveal-kaskad, count-up-stats, trivia, solved/missed-listor och share/replay-knappar.
+- `screens/loading.jsx`: loading- och error-skärmar.
 - `data/map.js`: legacy/stiliserad karta för äldre experiment, inte source of truth.
 
 ## Source of truth
@@ -38,5 +41,5 @@ OSM-geometri är facit för gatans läge, form och klickyta. All handritad eller
 
 ## Närmaste refactor-mål
 
-- Minska `screens.jsx` genom att lyfta Results till egen fil när nästa resultatrunda görs.
+- Datapass: byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga stadsdelspolygoner. Påverkar `classifyDistrict` i pipelinen, district frames på paper-overlayet och `focusDistrict` flyTo-mål.
 - Utvärdera Vite/ES-moduler först när fler browser-/unit-tester kräver riktig modulmiljö.

@@ -39,6 +39,10 @@ for (const expected of [
   'modes/quiz.jsx',
   'modes/time.jsx',
   'modes/learn.jsx',
+  'screens/menu.jsx',
+  'screens/area-select.jsx',
+  'screens/results.jsx',
+  'screens/loading.jsx',
 ]) {
   if (!localScripts.includes(expected)) {
     fail(`index.html no longer loads expected script: ${expected}`);
