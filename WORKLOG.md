@@ -28,6 +28,11 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Förenklad `useTweaks`-ternär i `app.jsx`.
 - Skapade `WORKLOG.md` (denna fil) och länkade från `ROADMAP.md` + `ARCHITECTURE.md`.
 
+### 2026-05-12 — Claude (game-utils enhetstester)
+- La till `scripts/test-game-utils.mjs` — 26 tester över `normalizeStreet`, `evaluateGuess`, `matchesGuess`, `pointsForGuess`, `streetHint`, `DIFFICULTY_CAPS`, `filterByDifficulty`, `streetsForDistricts`, `quizRoundSize`, `shuffleStreets`. Kör utan byggsteg via Node-sandbox med fake `window`.
+- Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
+- README uppdaterad med körinstruktion.
+
 ## Öppna frågor (väntar på Sander)
 
 ### Tweaks-panel.jsx framtid
@@ -46,8 +51,8 @@ Skulle spara FCP-kostnad när live-fetch + cache funkar (= normalflödet). Inte 
 
 Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 
-1. **Enhetstestsvit för `game-utils.jsx`** (1-2 h, låg risk). Node-sandbox utan byggsteg. Täck `evaluateGuess` (exact/fuzzy/wrong), `fuzzyLimit`-edges, `pointsForGuess`, `streetHint`-nivåer, `filterByDifficulty`. Hänger sedan på `scripts/check-static.mjs` eller egen runner.
-2. **Lyft OSM-processing till delad modul** (medel storlek, medel risk). Idag duplicerat mellan `data/osm.js` och `scripts/build-osm-bundle.mjs`: `classifyDistrict`, `processOverpass`, weight-mapping, `metersBetween`. Lägg i `data/osm-pipeline.js` som UMD/dual-context modul. Kör build-osm-bundle.mjs som regressionstest.
+1. [x] **Enhetstestsvit för `game-utils.jsx`** — levererad 2026-05-12. `scripts/test-game-utils.mjs`, 26 tester, kör med `node scripts/test-game-utils.mjs`. Bygg vidare här när nya spelregler läggs till.
+2. **Lyft OSM-processing till delad modul** (medel storlek, medel risk). Idag duplicerat mellan `data/osm.js` och `scripts/build-osm-bundle.mjs`: `classifyDistrict`, `processOverpass`, weight-mapping, `metersBetween`. Lägg i `data/osm-pipeline.js` som UMD/dual-context modul. Kör `node scripts/build-osm-bundle.mjs` som regressionstest (kräver Overpass-åtkomst, så valbart - alternativt mocka fetch).
 3. **Dela upp `modes.jsx`** (mekanisk, medel storlek). Mål: `modes/fill.jsx`, `modes/quiz.jsx`, `modes/time.jsx`, `modes/learn.jsx`, `modes/guess-pop.jsx`. Glöm inte att uppdatera `index.html` script-ordningen och `scripts/check-static.mjs` expected-listan.
 4. **Dela upp `map.jsx`** (stor, högre risk). Mål: `map/leaflet-init.jsx`, `map/street-layers.jsx`, `map/labels.jsx`, `map/scratch-overlay.jsx`. Var försiktig med Leaflet-livscykeln; nuvarande effekter ordnas medvetet.
 5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.

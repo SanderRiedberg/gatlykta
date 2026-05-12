@@ -24,6 +24,12 @@ Kör en snabb statisk sanity-check:
 node scripts/check-static.mjs
 ```
 
+Kör enhetstesterna för spelreglerna (fuzzy matching, ledtrådar, poäng, svårighetsfilter, quiz-slumpning):
+
+```bash
+node scripts/test-game-utils.mjs
+```
+
 ## Publicering
 
 Projektet är statiskt och kan publiceras direkt från repo-roten.
