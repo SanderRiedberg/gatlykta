@@ -37,53 +37,6 @@ function jitter(seed, n, amount) {
   return (x - Math.floor(x) - 0.5) * amount;
 }
 
-function offsetPoint(point, prev, next, seed, n, laneOffset, jitterAmount) {
-  const dx = next.x - prev.x;
-  const dy = next.y - prev.y;
-  const len = Math.hypot(dx, dy) || 1;
-  const ux = dx / len;
-  const uy = dy / len;
-  const nx = -uy;
-  const ny = ux;
-  const side = laneOffset + jitter(seed, n, jitterAmount);
-  const along = jitter(seed, n + 211, jitterAmount * 0.35);
-  return {
-    x: point.x + nx * side + ux * along,
-    y: point.y + ny * side + uy * along,
-  };
-}
-
-function drawScrapeStroke(ctx, pts, progress, seed, width, laneOffset, jitterAmount) {
-  if (!pts || pts.length < 2 || progress <= 0) return;
-  const segs = [];
-  let total = 0;
-  for (let i = 1; i < pts.length; i++) {
-    const len = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
-    if (len > 0) { segs.push({ i, len }); total += len; }
-  }
-  if (!total) return;
-
-  const limit = total * Math.max(0, Math.min(1, progress));
-  let travelled = 0;
-  let started = false;
-  ctx.lineWidth = width;
-  ctx.beginPath();
-  for (const seg of segs) {
-    if (travelled >= limit) break;
-    const a = pts[seg.i - 1];
-    const b = pts[seg.i];
-    const remaining = limit - travelled;
-    const t = Math.min(1, remaining / seg.len);
-    const end = t >= 1 ? b : { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
-    const start = offsetPoint(a, a, b, seed, seg.i * 3, laneOffset, jitterAmount);
-    const stop = offsetPoint(end, a, b, seed, seg.i * 3 + 1, laneOffset, jitterAmount);
-    if (!started) { ctx.moveTo(start.x, start.y); started = true; }
-    ctx.lineTo(stop.x, stop.y);
-    travelled += seg.len;
-  }
-  if (started) ctx.stroke();
-}
-
 // Eraser brush: stamps soft elliptical marks along the street path. Used with
 // destination-out composite so each stamp punches a soft hole through the
 // paper overlay. Gives a pencil/eraser sweep feel rather than a cartoon scrape.
@@ -174,6 +127,5 @@ Object.assign(window, {
   streetWidthBaseFromClass,
   hashStreet,
   jitter,
-  drawScrapeStroke,
   drawEraserBrush,
 });

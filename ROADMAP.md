@@ -17,6 +17,7 @@ Kärnan är geografisk igenkänning: gatans position, form och sammanhang måste
 - Quiz kan köras med tangentbord/diktering eller klick.
 - Fuzzy matching, ledtrådar, facit efter miss och lokal scratch-reveal finns i prototypform.
 - Hard mode använder hela bundlade OSM-urvalet; quiz rundar av till slumpade delomgångar.
+- Kart- och scratch-koden är uppdelad i mindre helpers; gammal scrape-logik är borttagen så nästa animationsrunda kan fokusera på den aktiva eraser-brush-revealen.
 
 ## Teknisk riktning
 

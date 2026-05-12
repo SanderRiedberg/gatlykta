@@ -60,6 +60,11 @@ Polish triggered by Sander's live testing:
 - Testet hittade en layoutbugg: Results-map preview saknade `position: relative`, så `.leaflet-host` kunde täcka hela viewporten och fånga klick på action-knappar. Fixat i `styles.css`.
 - Det täcker nu den nyligen byggda Results/Trivia/Share-ytan utan att kräva live-Overpass eller browser permissions.
 
+### 2026-05-12 — Codex (scratch helper cleanup)
+- Rensade bort pensionerade `drawScrapeStroke`/`offsetPoint` från `map-rendering.jsx`.
+- Kvarvarande reveal-väg är nu bara `drawEraserBrush`, vilket matchar den faktiska scratch-overlayn och minskar dubbel logik inför nästa animationsrunda.
+- `ARCHITECTURE.md` uppdaterad så filansvaret beskriver eraser-brush reveal i stället för gamla scratch-strokes.
+
 ### 2026-05-12 — Claude (OSM pipeline merge + orienteringshint)
 - Strandvägen kom som två frågor i Quiz: OSM:s ways för en gata som korsar district-bounds blev två separata entities (`norrmalm::strandvägen` + `ostermalm::strandvägen`). `processOverpass` grupperar nu by name only och bestämmer primärt district by majoritet av way-points. Bundle regenererad: 933 streets (-43 = duplikaterna borta). +1 test för cross-district-fallet (`23932b9`).
 - Paper-vyn var svår att orientera sig på (bara ett "streck"): lägg in svaga streckade rektangel-ramar per active district med alpha 0.18, under streetskissen. Ingen kustlinje eller geometri avslöjas (`8623d76`).

@@ -21,7 +21,7 @@ Det är medvetet okej för prototypen, men inför 1.0 bör projektet troligen fl
 - `data/osm.js`: livehämtning, cache och fallback. Anropar `processOverpass` från pipeline-modulen.
 - `data/fallback-streets.js`: genererad OSM-bundle. Ska inte handredigeras.
 - `game-utils.jsx`: fuzzy matching, ledtrådar, svårighet, poäng och rundslumpning.
-- `map-rendering.jsx`: lågnivåhjälpare för kartstil, street widths och scratch-strokes.
+- `map-rendering.jsx`: lågnivåhjälpare för kartstil, street widths och eraser-brush reveal.
 - `map/leaflet-core.jsx`: Leaflet-init, focus/zoom, resize och style-progress.
 - `map/street-layers.jsx`: street-polylines, hit areas och state styling.
 - `map/scratch-overlay.jsx`: paper canvas, street sketch och reveal/scratch-overlay.
