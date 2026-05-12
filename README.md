@@ -12,7 +12,7 @@ python3 -m http.server 8765
 
 Öppna sedan `http://127.0.0.1:8765`.
 
-För att tvinga den bundlade demokartan i stället för livehämtning från Overpass:
+För att tvinga den bundlade OSM-kartan i stället för livehämtning från Overpass:
 
 ```text
 http://127.0.0.1:8765/?fallback=1
@@ -32,4 +32,4 @@ För `gatlykta.riedberg.se` pekas DNS vanligtvis som `CNAME gatlykta -> <github-
 
 ## Data
 
-Appen använder livegator från OpenStreetMap via Overpass när det går, cachear resultatet i `localStorage` och faller tillbaka på `data/fallback-streets.js` vid problem eller när `?fallback=1` används.
+Appen använder livegator från OpenStreetMap via Overpass när det går, cachear resultatet i `localStorage` och faller tillbaka på OSM-exporten i `data/fallback-streets.js` vid problem eller när `?fallback=1` används. Uppdatera den bundlade datan med `node scripts/build-osm-bundle.mjs`.

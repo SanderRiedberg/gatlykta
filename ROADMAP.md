@@ -8,7 +8,7 @@ Gatlykta ska vara ett snyggt, lekfullt webbläsarspel där spelaren lär sig en 
 
 - Fyra grova spellägen finns: Fyll i, Quiz, Tidspress och Lär-läge.
 - Kartan använder Leaflet, satellittiles och OSM-gator som hämtas via Overpass och cacheas i `localStorage`.
-- En lokal fallback-karta bundlas i `data/fallback-streets.js` och kan testas med `?fallback=1`.
+- En lokal fallback-karta med verklig OSM-geometri bundlas i `data/fallback-streets.js` och kan testas med `?fallback=1`.
 - Stadsdelarna är förenklade bounding boxes för Gamla Stan, Norrmalm, Östermalm, Vasastan, Kungsholmen och Södermalm.
 - Stilväljaren har fem presets: Skiss, Litografi, Cartoon, Minimalism och Pop-art.
 - Progressionen färgar/revealar lokalt längs klarade gator och deras närområde, utan att visa hela satellitbilden direkt.
@@ -18,7 +18,7 @@ Gatlykta ska vara ett snyggt, lekfullt webbläsarspel där spelaren lär sig en 
 - Säkerställ att alla fyra spellägen startar, går att spela och kan avslutas.
 - Gör resultatlogiken konsekvent: rätt, missade, visade svar, tid och bästa kombo.
 - Ge varje område stjärnor/medaljer per läge och visa bästa resultat tydligt.
-- Förfina lokal fallback för gatdata så den visuellt matchar live-kartan bättre och kan användas för demos.
+- Håll lokal fallback på verklig OSM-geometri; handritad geometri får bara användas som dekorativt lager, aldrig som facitdata.
 
 ## Fas 2: Bättre spelkänsla
 
@@ -29,8 +29,8 @@ Gatlykta ska vara ett snyggt, lekfullt webbläsarspel där spelaren lär sig en 
 
 ## Fas 3: Kart- och stilförfining
 
-- Bestäm långsiktig kartkälla: handritad SVG för ett begränsat område eller OSM/tiles för skalbarhet.
-- Om handritad SVG används: skapa en central Stockholm-karta med kontrollerade gatsegment och klickytor.
+- Bestäm långsiktig kartkälla: OSM/tiles som sann geografi, med handritad stil som visuellt lager ovanpå.
+- Om handritad SVG används: använd den bara som illustration ovanpå verkliga gatsegment och klickytor.
 - Om OSM behålls: förbättra stadsdelsklassning från bounding boxes till polygoner.
 - Koppla varje stilpreset till både tile-filter, pappersstruktur och reveal-bredd.
 
