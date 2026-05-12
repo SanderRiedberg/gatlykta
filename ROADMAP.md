@@ -9,6 +9,7 @@ Gatlykta ska vara ett snyggt, lekfullt webbläsarspel där spelaren lär sig en 
 - Fyra grova spellägen finns: Fyll i, Quiz, Tidspress och Lär-läge.
 - Kartan använder Leaflet, satellittiles och OSM-gator som hämtas via Overpass och cacheas i `localStorage`.
 - En lokal fallback-karta med verklig OSM-geometri bundlas i `data/fallback-streets.js` och kan testas med `?fallback=1`.
+- Hard använder hela OSM-urvalet; quizet spelar ett större slumpat delurval per omgång.
 - Stadsdelarna är förenklade bounding boxes för Gamla Stan, Norrmalm, Östermalm, Vasastan, Kungsholmen och Södermalm.
 - Stilväljaren har fem presets: Skiss, Litografi, Cartoon, Minimalism och Pop-art.
 - Progressionen färgar/revealar lokalt längs klarade gator och deras närområde, utan att visa hela satellitbilden direkt.

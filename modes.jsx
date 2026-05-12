@@ -43,6 +43,20 @@ function pointsForGuess({ wrongs = 0, hints = 0, quality = 'exact' }) {
   return Math.max(35, 100 - wrongs * 15 - hints * 20 - (quality === 'fuzzy' ? 5 : 0));
 }
 
+function shuffleStreets(streets) {
+  const out = [...streets];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+function quizRoundSize(difficulty, total) {
+  const base = difficulty === 'hard' ? 40 : difficulty === 'medium' ? 24 : 14;
+  return Math.min(total, base);
+}
+
 // ════════════════════════════════════════════════════════════════════
 // FILL-IN
 // ════════════════════════════════════════════════════════════════════
@@ -181,7 +195,7 @@ function FillMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle
 // ════════════════════════════════════════════════════════════════════
 function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, onFinish, onQuit }) {
   const active = useM(() => streetsForDistricts(streets, districtIds, difficulty), [streets, districtIds, difficulty]);
-  const queue = useM(() => [...active].sort(() => Math.random() - 0.5).slice(0, Math.min(active.length, 14)), [active]);
+  const queue = useM(() => shuffleStreets(active).slice(0, quizRoundSize(difficulty, active.length)), [active, difficulty]);
   const [idx, setIdx] = useS(0);
   const [answerMode, setAnswerMode] = useS('type');
   const [answer, setAnswer] = useS('');

@@ -54,7 +54,7 @@ function classifyDistrict(coords) {
 }
 
 // ─────────────── Overpass fetch + cache ───────────────
-const CACHE_KEY = 'gatlykta.osm.v3';
+const CACHE_KEY = 'gatlykta.osm.v4';
 const CACHE_TTL = 1000 * 60 * 60 * 24 * 30; // 30 days
 
 function loadCachedOSM() {
@@ -275,17 +275,13 @@ function processOverpass(json) {
     if (len < 60) continue; // skip tiny ways
     out.push(s);
   }
-  // Sort by length desc, cap each district to a reasonable number
+  // Sort by length desc. Difficulty is applied later from per-district rank:
+  // easy/medium take the most prominent streets, hard keeps the full OSM set.
   out.sort((a, b) => b.lengthMeters - a.lengthMeters);
-  const perDistrict = {};
-  const capped = out.filter(s => {
-    perDistrict[s.district] = (perDistrict[s.district] || 0) + 1;
-    return perDistrict[s.district] <= 28; // cap per district to keep game manageable
-  });
   // Compute per-district rank (0 = most prominent / longest)
   const ranks = {};
-  for (const s of capped) { s.rank = (ranks[s.district] = (ranks[s.district] || 0)); ranks[s.district]++; }
-  return capped;
+  for (const s of out) { s.rank = (ranks[s.district] = (ranks[s.district] || 0)); ranks[s.district]++; }
+  return out;
 }
 
 const DIFFICULTY_CAPS = { easy: 8, medium: 16, hard: 999 };

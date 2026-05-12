@@ -84,17 +84,12 @@ function processOverpass(json) {
   }
 
   out.sort((a, b) => b.lengthMeters - a.lengthMeters);
-  const perDistrict = {};
-  const capped = out.filter(s => {
-    perDistrict[s.district] = (perDistrict[s.district] || 0) + 1;
-    return perDistrict[s.district] <= 28;
-  });
   const ranks = {};
-  for (const s of capped) {
+  for (const s of out) {
     s.rank = (ranks[s.district] = (ranks[s.district] || 0));
     ranks[s.district]++;
   }
-  return capped;
+  return out;
 }
 
 async function fetchOverpass() {

@@ -33,3 +33,5 @@ För `gatlykta.riedberg.se` pekas DNS vanligtvis som `CNAME gatlykta -> <github-
 ## Data
 
 Appen använder livegator från OpenStreetMap via Overpass när det går, cachear resultatet i `localStorage` och faller tillbaka på OSM-exporten i `data/fallback-streets.js` vid problem eller när `?fallback=1` används. Uppdatera den bundlade datan med `node scripts/build-osm-bundle.mjs`.
+
+Svårigheterna filtrerar på gatans längdrankning per stadsdel: lätt och medel tar de mest framträdande gatorna, medan svår använder hela OSM-urvalet. Quizläget tar sedan ett slumpat delurval per omgång så rundorna varierar.
