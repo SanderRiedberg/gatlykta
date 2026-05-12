@@ -300,9 +300,24 @@ function LeafletMap({
     };
 
     draw();
-    const trigger = () => { if (!raf) raf = requestAnimationFrame(() => { raf = null; draw(); }); };
-    map.on('drag dragend move zoom moveend zoomend resize viewreset', trigger);
-    return () => { try { map.off('drag dragend move zoom moveend zoomend resize viewreset', trigger); } catch {} if (raf) cancelAnimationFrame(raf); };
+    let zooming = false;
+    const trigger = () => {
+      if (zooming) return;
+      if (!raf) raf = requestAnimationFrame(() => { raf = null; draw(); });
+    };
+    const onZoomStart = () => { zooming = true; canvas.style.opacity = '0'; };
+    const onZoomEnd = () => { zooming = false; canvas.style.opacity = '1'; trigger(); };
+    map.on('drag dragend move moveend resize viewreset', trigger);
+    map.on('zoomstart', onZoomStart);
+    map.on('zoomend', onZoomEnd);
+    return () => {
+      try {
+        map.off('drag dragend move moveend resize viewreset', trigger);
+        map.off('zoomstart', onZoomStart);
+        map.off('zoomend', onZoomEnd);
+      } catch {}
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [scratch, streetStates, streets, activeDistricts, mapStyle, progress]);
 
   // Render labels for solved/hovered streets
