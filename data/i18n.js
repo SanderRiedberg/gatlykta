@@ -78,6 +78,10 @@ const I18N = {
     'results.again': 'Spela igen',
     'results.pick_area': 'Byt område',
     'results.home': 'Till menyn',
+    'results.try_another': 'Annat spelläge',
+    'results.share': 'Dela',
+    'results.shared': 'Kopierat till urklipp',
+    'results.share_unavailable': 'Kunde inte dela',
     'results.correct': 'Rätt',
     'results.streak': 'Längsta kombo',
 
@@ -213,6 +217,10 @@ const I18N = {
     'results.again': 'Play again',
     'results.pick_area': 'Pick another area',
     'results.home': 'Back to menu',
+    'results.try_another': 'Try another mode',
+    'results.share': 'Share',
+    'results.shared': 'Copied to clipboard',
+    'results.share_unavailable': 'Sharing not available',
     'results.correct': 'Correct',
     'results.streak': 'Best streak',
 
