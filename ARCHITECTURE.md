@@ -2,6 +2,10 @@
 
 Strukturen för hur filerna hänger ihop. Den långsiktiga visionen ligger i [`ROADMAP.md`](./ROADMAP.md). Pågående arbete och handover mellan utvecklarsessioner ligger i [`WORKLOG.md`](./WORKLOG.md).
 
+## Tooling
+
+`package.json` finns endast för dev-verktyg (Playwright). Själva appen är fortfarande statisk HTML/JS utan byggsteg. `npm` används bara för att hämta `@playwright/test`; om man inte kör browser-smoke behöver man inte installera något alls. `node scripts/test-all.mjs` kör hela unit-suiten utan dependencies.
+
 ## Runtime
 
 Projektet är fortfarande en statisk webbsida utan buildsteg. `index.html` laddar React, Leaflet och Babel från CDN och sedan appens scripts i beroendeordning.
@@ -31,4 +35,3 @@ OSM-geometri är facit för gatans läge, form och klickyta. All handritad eller
 ## Närmaste refactor-mål
 
 - Dela `map.jsx` i hook/komponenter för map init, street layers, labels och scratch overlay.
-- Inför ett minimalt smoke-test för `?fallback=1`, startvy, områdesval och quiz skrivläge.

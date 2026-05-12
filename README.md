@@ -42,6 +42,14 @@ Eller kör allt på en gång:
 node scripts/test-all.mjs
 ```
 
+Kör browser-smoke över `?fallback=1`-flödet (kräver Node deps via `npm install` första gången):
+
+```bash
+npm install
+npx playwright install chromium  # första gången
+npm run test:e2e
+```
+
 ## Publicering
 
 Projektet är statiskt och kan publiceras direkt från repo-roten.

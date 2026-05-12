@@ -33,6 +33,14 @@ Skriv kort. Datera entries. Markera tasks som klara med [x] när de committas.
 - Inga regressioner avslöjades; alla 26 testerna passerar mot nuvarande `game-utils.jsx`.
 - README uppdaterad med körinstruktion.
 
+### 2026-05-12 — Claude (Playwright smoke-test)
+- La till `package.json` med `@playwright/test` som enda devDep. `npm install` + `npx playwright install chromium` engångskostnad.
+- `playwright.config.mjs`: startar `python3 -m http.server 8765` automatiskt via webServer-config, headless Chromium, retain trace + screenshot on failure.
+- `e2e/smoke.spec.mjs`: två tester över `?fallback=1`-flödet (meny → område → quiz typed; meny → område → fill mode med map). Lyssnar på `pageerror`/`console.error` och fail:ar testet vid runtime-fel. Filtrerar bort den ofarliga Babel-in-production-varningen.
+- Båda tester går på ~6.5s total. Hittade inga regressioner i nuvarande build.
+- `.gitignore` utökad med `test-results/`, `playwright-report/`, `playwright/.cache/`.
+- README + ARCHITECTURE uppdaterade. Notera i ARCHITECTURE: `package.json` finns endast för dev-tooling, själva appen är fortsatt statisk utan byggsteg.
+
 ### 2026-05-12 — Claude (test-all runner)
 - La till `scripts/test-all.mjs` som kör `check-static`, `test-game-utils` och `test-osm-pipeline` i sekvens. Exit-code är icke-noll om någon misslyckas.
 - README uppdaterad med körinstruktion. Använd `node scripts/test-all.mjs` som en-knapps-verifiering före commit.
@@ -76,7 +84,7 @@ Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 3. [x] **Dela upp `modes.jsx`** — levererad 2026-05-12. Fem filer under `modes/`, IIFE-mönster, scriptordning i `index.html` uppdaterad.
 4. **Dela upp `map.jsx`** (stor, högre risk). Mål: `map/leaflet-init.jsx`, `map/street-layers.jsx`, `map/labels.jsx`, `map/scratch-overlay.jsx`. Var försiktig med Leaflet-livscykeln; nuvarande effekter ordnas medvetet.
 5. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
-6. **Smoke-test för `?fallback=1`-flödet** (litet, lågrisk). Playwright eller liten browser-headless som startar sidan med `?fallback=1`, klickar genom meny → område → quiz skrivläge, och kontrollerar att inga konsolfel uppstår.
+6. [x] **Smoke-test för `?fallback=1`-flödet** — levererad 2026-05-12. `e2e/smoke.spec.mjs` via Playwright. Bygg vidare här när nya spelflöden behöver täckning.
 
 ## Kontaktytor
 
