@@ -1,4 +1,4 @@
-/* global L, window, DISTRICTS, getMapStylePreset, hashStreet, drawEraserBrush */
+/* global L, window, getMapStylePreset, hashStreet, drawEraserBrush */
 // Gatlykta — canvas paper/scratch overlay for the Leaflet map.
 
 function createScratchOverlay(map, container) {
@@ -60,7 +60,7 @@ function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetSta
       ctx.fillRect(x, y, 1, 1);
     }
 
-    drawDistrictFrames(ctx, DISTRICTS, activeDistricts, toCanvasPoint, inkColor());
+    drawCoastline(ctx, toCanvasPoint, inkColor());
     drawStreetSketch(ctx, { streets, activeDistricts, streetStates, reveals, style, progress: p, zoom: map.getZoom(), toCanvasPoint, inkColor: inkColor() });
     drawSolvedReveals(ctx, { streets, activeDistricts, streetStates, reveals, style, zoom: map.getZoom(), toCanvasPoint });
 
@@ -99,42 +99,33 @@ function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetSta
   };
 }
 
-function drawDistrictFrames(ctx, districts, activeDistricts, toCanvasPoint, inkColor) {
-  const polygons = window.DISTRICT_POLYGONS || {};
+// Trace the shoreline of every visible island as a solid thin line on the
+// paper. Stockholm's geography is islands and water, so a coastline reads as
+// natural orientation — Norr Mälarstrand follows the north shore of
+// Kungsholmen, Hornsgatan crosses Södermalm east-west — without exposing the
+// street network. Falls back gracefully when window.COASTLINE isn't loaded.
+function drawCoastline(ctx, toCanvasPoint, inkColor) {
+  const islands = window.COASTLINE || [];
+  if (!islands.length) return;
   ctx.save();
-  ctx.globalAlpha = 0.18;
+  ctx.globalAlpha = 0.34;
   ctx.strokeStyle = inkColor;
-  ctx.lineWidth = 0.7;
-  ctx.setLineDash([5, 6]);
-  for (const district of districts) {
-    if (activeDistricts && !activeDistricts.includes(district.id)) continue;
-    const polygon = polygons[district.id];
-    if (polygon && polygon.length > 2) {
-      ctx.beginPath();
-      const p0 = toCanvasPoint(polygon[0]);
-      ctx.moveTo(p0.x, p0.y);
-      for (let i = 1; i < polygon.length; i++) {
-        const p = toCanvasPoint(polygon[i]);
-        ctx.lineTo(p.x, p.y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-      continue;
-    }
-    const [[bs, bw], [bn, be]] = district.bounds;
-    const nw = toCanvasPoint([bn, bw]);
-    const ne = toCanvasPoint([bn, be]);
-    const sw = toCanvasPoint([bs, bw]);
-    const se = toCanvasPoint([bs, be]);
+  ctx.lineWidth = 0.9;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  for (const island of islands) {
+    const pts = island.points;
+    if (!pts || pts.length < 3) continue;
     ctx.beginPath();
-    ctx.moveTo(nw.x, nw.y);
-    ctx.lineTo(ne.x, ne.y);
-    ctx.lineTo(se.x, se.y);
-    ctx.lineTo(sw.x, sw.y);
+    const p0 = toCanvasPoint(pts[0]);
+    ctx.moveTo(p0.x, p0.y);
+    for (let i = 1; i < pts.length; i++) {
+      const p = toCanvasPoint(pts[i]);
+      ctx.lineTo(p.x, p.y);
+    }
     ctx.closePath();
     ctx.stroke();
   }
-  ctx.setLineDash([]);
   ctx.restore();
 }
 

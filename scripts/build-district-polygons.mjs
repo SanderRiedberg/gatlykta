@@ -12,11 +12,19 @@ import { writeFile } from 'node:fs/promises';
 //   Kungsholmen  → kungsholmen
 //   Södermalm    → sodermalm
 
-const NAME_TO_ID = {
-  'Gamla stan': 'gamla-stan',
+// For the three "island districts" we use OSM's place=island polygon instead
+// of the admin_level=10 boundary, because the admin boundary often covers
+// only part of the geographic island (e.g. admin "Kungsholmen" is roughly
+// the eastern half — Stadshagen and Kristineberg sit on the same island
+// but under separate admin names). For Norrmalm/Östermalm/Vasastan the
+// admin polygon is fine; they're on the mainland.
+const ADMIN_NAME_TO_ID = {
   'Norrmalm': 'norrmalm',
   'Östermalm': 'ostermalm',
   'Vasastaden': 'vasastan',
+};
+const ISLAND_NAME_TO_ID = {
+  'Stadsholmen': 'gamla-stan',
   'Kungsholmen': 'kungsholmen',
   'Södermalm': 'sodermalm',
 };
@@ -31,7 +39,13 @@ const QUERY = `
 [out:json][timeout:60];
 (
   relation["boundary"="administrative"]["admin_level"="10"]
-    ["name"~"^(Norrmalm|Östermalm|Vasastaden|Kungsholmen|Södermalm|Gamla stan)$"]
+    ["name"~"^(Norrmalm|Östermalm|Vasastaden)$"]
+    (59.290,17.970,59.360,18.140);
+  relation["place"~"^(island|islet)$"]
+    ["name"~"^(Stadsholmen|Södermalm)$"]
+    (59.290,17.970,59.360,18.140);
+  way["place"~"^(island|islet)$"]
+    ["name"="Kungsholmen"]
     (59.290,17.970,59.360,18.140);
 );
 out geom;
@@ -135,27 +149,55 @@ async function fetchOverpass() {
 }
 
 const json = await fetchOverpass();
-const relations = (json.elements || []).filter(e => e.type === 'relation');
+const elements = json.elements || [];
 
 const polygons = {};
-for (const rel of relations) {
-  const osmName = rel.tags && rel.tags.name;
-  const districtId = NAME_TO_ID[osmName];
+
+// Admin relations (mainland districts): stitch outer way members.
+for (const rel of elements.filter(e => e.type === 'relation' && e.tags && e.tags.boundary === 'administrative')) {
+  const osmName = rel.tags.name;
+  const districtId = ADMIN_NAME_TO_ID[osmName];
   if (!districtId) continue;
   const outerWays = (rel.members || [])
     .filter(m => m.type === 'way' && m.role === 'outer' && Array.isArray(m.geometry));
-  if (!outerWays.length) {
-    console.warn(`  ! ${osmName}: no outer ways`);
-    continue;
-  }
+  if (!outerWays.length) { console.warn(`  ! ${osmName}: no outer ways`); continue; }
   const ring = stitchRing(outerWays);
   const closed = ring.length > 2 && endpointsMatch(ring[0], ring[ring.length - 1]);
   const decimated = roundCoords(decimate(ring, 25), 6);
   polygons[districtId] = decimated;
-  console.log(`  ${districtId.padEnd(13)} ← ${osmName}: ${outerWays.length} ways, ${ring.length}→${decimated.length} pts, ${closed ? 'closed' : 'OPEN'}`);
+  console.log(`  ${districtId.padEnd(13)} ← admin ${osmName}: ${outerWays.length} ways, ${ring.length}→${decimated.length} pts, ${closed ? 'closed' : 'OPEN'}`);
 }
 
-for (const id of Object.values(NAME_TO_ID)) {
+// Island relations (Stadsholmen, Södermalm): stitch outer way members.
+for (const rel of elements.filter(e => e.type === 'relation' && e.tags && (e.tags.place === 'island' || e.tags.place === 'islet'))) {
+  const osmName = rel.tags.name;
+  const districtId = ISLAND_NAME_TO_ID[osmName];
+  if (!districtId) continue;
+  const outerWays = (rel.members || [])
+    .filter(m => m.type === 'way' && m.role === 'outer' && Array.isArray(m.geometry));
+  if (!outerWays.length) { console.warn(`  ! ${osmName}: no outer ways`); continue; }
+  const ring = stitchRing(outerWays);
+  const closed = ring.length > 2 && endpointsMatch(ring[0], ring[ring.length - 1]);
+  const decimated = roundCoords(decimate(ring, 25), 6);
+  polygons[districtId] = decimated;
+  console.log(`  ${districtId.padEnd(13)} ← island ${osmName}: ${outerWays.length} ways, ${ring.length}→${decimated.length} pts, ${closed ? 'closed' : 'OPEN'}`);
+}
+
+// Island ways (Kungsholmen as a single closed way).
+for (const way of elements.filter(e => e.type === 'way' && e.tags && (e.tags.place === 'island' || e.tags.place === 'islet'))) {
+  const osmName = way.tags.name;
+  const districtId = ISLAND_NAME_TO_ID[osmName];
+  if (!districtId || polygons[districtId]) continue;
+  if (!Array.isArray(way.geometry) || way.geometry.length < 3) continue;
+  const ring = way.geometry.map(g => [g.lat, g.lon]);
+  const closed = endpointsMatch(ring[0], ring[ring.length - 1]);
+  const decimated = roundCoords(decimate(ring, 25), 6);
+  polygons[districtId] = decimated;
+  console.log(`  ${districtId.padEnd(13)} ← island ${osmName} (way): ${ring.length}→${decimated.length} pts, ${closed ? 'closed' : 'OPEN'}`);
+}
+
+const expectedIds = ['gamla-stan', 'norrmalm', 'ostermalm', 'vasastan', 'kungsholmen', 'sodermalm'];
+for (const id of expectedIds) {
   if (!polygons[id]) console.warn(`  ! Missing polygon for ${id}`);
 }
 
