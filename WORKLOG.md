@@ -42,6 +42,12 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-13 — Claude (öar som districts + coastline + quiz auto-zoom)
+Triggered by Sander testing the district polygons live:
+- Kungsholmen-halva-buggen: admin_level=10 "Kungsholmen" är bara östra halvan (resten är Stadshagen/Kristineberg). Bytt till `place=island` polygon för Kungsholmen, Stadsholmen och Södermalm; admin behållen för Norrmalm/Östermalm/Vasastan. Kungsholmen 41 → 227 polygon-punkter (hela ön). Bundle 656 → 733 streets (`940ff55`).
+- Coastline-orientering: nytt `scripts/build-coastline.mjs` hämtar alla place=island/islet i bbox, stitchar rings, filtrerar <1500 m². 15 öar i `data/coastline.js` (Södermalm, Kungsholmen, Djurgården, Långholmen, Stadsholmen, Skeppsholmen, Reimersholme osv.). Paper-overlayet ritar nu öarnas konturer istället av administrativa district-rektanglar — naturlig "Norr Mälarstrand följer Kungsholmens nordkant"-orientering utan att avslöja gator (`940ff55`).
+- Quiz auto-zoom: i typed-mode flyger kartan nu in på varje ny target med padding och maxZoom 17. Ny helper `focusGatlyktaStreet` + ny `focusStreet`-prop på LeafletMap. Click-mode lämnas oförändrad (zoom dit skulle avslöja svaret). Fill/Time påverkas inte (`e948b39`).
+
 ### 2026-05-12 — Claude (screens split + district polygons)
 - Delade `screens.jsx` (341 rader) i fyra filer under `screens/`: `menu.jsx`, `area-select.jsx`, `results.jsx`, `loading.jsx`. Samma IIFE-pattern som `modes/`. `screens/results.jsx` är ~180 rader och håller hela grand-reveal- och trivia-logiken (`650006a`).
 - Datapass: hämtade admin_level=10 boundary relations för 6 stadsdelar från Overpass via nytt `scripts/build-district-polygons.mjs`. Stitchar outer ways till closed rings, decimerar till ~25m spacing, sparar som `data/district-polygons.js` (18-116 punkter per district). Vasastan mappas från OSM:s officiella `Vasastaden` (`9bc835d`).
