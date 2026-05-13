@@ -1,4 +1,4 @@
-/* global React, window, createGatlyktaMap, createScratchOverlay, removeScratchOverlay, renderStreetLayers, updateStreetLayerStyles, attachScratchOverlay, renderStreetLabels, renderDistrictLabels, focusGatlyktaMap, attachGatlyktaResizeHandling, applyGatlyktaMapStyle */
+/* global React, window, createGatlyktaMap, createScratchOverlay, removeScratchOverlay, renderStreetLayers, updateStreetLayerStyles, attachScratchOverlay, renderStreetLabels, renderDistrictLabels, focusGatlyktaMap, focusGatlyktaStreet, attachGatlyktaResizeHandling, applyGatlyktaMapStyle */
 // Gatlykta — React wrapper for the Leaflet map.
 
 const { useEffect: useEm, useRef: useRm } = React;
@@ -13,6 +13,7 @@ function LeafletMap({
   streets,
   activeDistricts = null,
   focusDistrict = null,
+  focusStreet = null,
   streetStates = {},
   onStreetClick,
   onStreetHover,
@@ -111,6 +112,12 @@ function LeafletMap({
   useEm(() => {
     focusGatlyktaMap(mapRef.current, focusDistrict);
   }, [focusDistrict]);
+
+  // Optional per-prompt focus (used by Quiz so each new street is centred and
+  // framed). Triggered by the street id changing.
+  useEm(() => {
+    if (focusStreet) focusGatlyktaStreet(mapRef.current, focusStreet);
+  }, [focusStreet && focusStreet.id]);
 
   useEm(() => {
     return attachGatlyktaResizeHandling(mapRef.current, containerRef.current);

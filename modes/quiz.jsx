@@ -176,7 +176,7 @@
           </div>
         </div>
         <div className="map-stage">
-          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={queue.length ? solvedIds.size/queue.length : (active.length ? solvedIds.size/active.length : 0)} />
+          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} focusStreet={answerMode === 'type' ? target : null} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={queue.length ? solvedIds.size/queue.length : (active.length ? solvedIds.size/active.length : 0)} />
           {target && (
             <div className={`quiz-prompt ${answerMode === 'type' ? 'typed' : ''}`}>
               <div className="quiz-switch" role="group" aria-label={t('quiz.mode_label')}>

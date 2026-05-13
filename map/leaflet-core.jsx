@@ -45,6 +45,28 @@ function focusGatlyktaMap(map, focusDistrict) {
   }
 }
 
+// Fly to a single street so it's centred and fully visible. Used by Quiz so
+// each new prompt frames the target rather than leaving the player on
+// whatever they zoomed into last round. No-op if the street has no geometry.
+function focusGatlyktaStreet(map, street) {
+  if (!map || !street || !Array.isArray(street.ways) || !street.ways.length) return;
+  let south = Infinity, west = Infinity, north = -Infinity, east = -Infinity;
+  for (const way of street.ways) {
+    for (const [lat, lng] of way) {
+      if (lat < south) south = lat;
+      if (lat > north) north = lat;
+      if (lng < west) west = lng;
+      if (lng > east) east = lng;
+    }
+  }
+  if (!isFinite(south)) return;
+  map.flyToBounds([[south, west], [north, east]], {
+    padding: [80, 80],
+    duration: 0.55,
+    maxZoom: 17,
+  });
+}
+
 function attachGatlyktaResizeHandling(map, container) {
   if (!map) return () => {};
   const onResize = () => map.invalidateSize();
@@ -77,6 +99,7 @@ function applyGatlyktaMapStyle(container, mapStyle, progress) {
 Object.assign(window, {
   createGatlyktaMap,
   focusGatlyktaMap,
+  focusGatlyktaStreet,
   attachGatlyktaResizeHandling,
   applyGatlyktaMapStyle,
 });
