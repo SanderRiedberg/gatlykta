@@ -42,6 +42,12 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-17 — Claude (rank-feedback + WORKLOG/ROADMAP sync + push)
+- Lade `fetchRank(districtId, mode, score)` i `data/remote-sync.js` som använder PostgREST count-headers + två filtrerade counts för tie-breaker.
+- Results visar nu "Du hamnade på plats X av Y" efter submit, "Topp 1 av Y — nytt rekord!" om #1. Din rad i topp-10 highlights med accent-bakgrund och `←` (`9168c97`).
+- WORKLOG och ROADMAP synkade: alla rundor sen 5-12 är listade som klara, nya kandidat-tasks formulerade, Status och Nästa bästa steg uppdaterade.
+- Pushade 18 commits till `origin/main`.
+
 ### 2026-05-16 — Claude (profile-sida + Supabase-verifiering)
 - `screens/profile.jsx`: ny top-level vy med overall mastery, per-district cards (best per mode), senaste 10 rundor, export/import/reset-knappar. Nås via Profil-länk i ModeMenu topbar (`02b003f`).
 - `scripts/check-supabase.mjs`: läser `data/remote-config.js`, hittar URL+key, hits 3 endpoints för att verifiera auth/tabell/RLS. Skriver en `__smoke__`-row som kan rensas med one-liner i SQL editor.
@@ -144,12 +150,28 @@ Förklarat 2026-05-12: bundeln laddas idag inline även när Overpass-fetch elle
 
 Sorterat efter storlek/risk. Plocka uppifrån och ner om inget annat trycker.
 
-1. [x] **Enhetstestsvit för `game-utils.jsx`** — levererad 2026-05-12. `scripts/test-game-utils.mjs`, 26 tester, kör med `node scripts/test-game-utils.mjs`. Bygg vidare här när nya spelregler läggs till.
-2. [x] **Lyft OSM-processing till delad modul** — levererad 2026-05-12. `data/osm-pipeline.js` delas mellan live-fetch och bundle-script. 15 enhetstester i `scripts/test-osm-pipeline.mjs`.
-3. [x] **Dela upp `modes.jsx`** — levererad 2026-05-12. Fem filer under `modes/`, IIFE-mönster, scriptordning i `index.html` uppdaterad.
-4. [x] **Dela upp `map.jsx`** — levererad 2026-05-12. `map.jsx` är tunn wrapper; helpers finns i `map/leaflet-core.jsx`, `map/street-layers.jsx`, `map/scratch-overlay.jsx`, `map/labels.jsx`.
-5. [x] **Smoke-test för `?fallback=1`-flödet** — levererad 2026-05-12 och utökad med Results/Trivia/Share 2026-05-12. `e2e/smoke.spec.mjs` via Playwright. Bygg vidare här när nya spelflöden behöver täckning.
-6. **Stadsdelspolygoner** (datapass, separat). Byt rektangulära `bounds` i `data/city-stockholm.js` mot riktiga polygoner. Påverkar `classifyDistrict`, `LeafletMap` district labels och `flyToBounds`.
+1. [x] **Enhetstestsvit för `game-utils.jsx`** — `scripts/test-game-utils.mjs`, 31 tester.
+2. [x] **Lyft OSM-processing till delad modul** — `data/osm-pipeline.js`, 20 tester.
+3. [x] **Dela upp `modes.jsx`** — fem filer under `modes/`.
+4. [x] **Dela upp `map.jsx`** — Codex pass.
+5. [x] **Smoke-test för `?fallback=1`-flödet** — `e2e/smoke.spec.mjs`, 3 specs.
+6. [x] **Stadsdelspolygoner** — `data/district-polygons.js` (admin för fastland, place=island för öar). `data/coastline.js` ritas på paper-overlay.
+7. [x] **Quiz auto-zoom till target** — `focusGatlyktaStreet` + `focusStreet`-prop.
+8. [x] **Dela `screens.jsx`** — fyra filer under `screens/`.
+9. [x] **TimeMode tidsval + Quiz round-size** — i area-select, persistas i useTweaks.
+10. [x] **Lokal scoreboard + street mastery** — `data/storage.js`, Lär-läge byggt om kring mastery.
+11. [x] **Supabase remote sync (optional)** — `data/remote-sync.js` + schema + check-script. Explicit submit-knapp i Results. `fetchRank` ger "plats X av Y"-feedback.
+12. [x] **Profile-sida** — `screens/profile.jsx` med export/import/reset.
+13. [x] **Mobil-HUD-polering** — `<= 600px` media query.
+
+Nya kandidater:
+
+A. **Fill mode popover viewport clamp** — när popover hamnar utanför viewport, klampa position. Liten polish.
+B. **Snabbare quiz-tempo** — confirma-delay 700ms → 400ms efter correct, så fart blir lite mer responsiv.
+C. **Spaced repetition i Lär-läge** — sortera så needs-work + learning kommer först i hovered-listan, inte by length.
+D. **Mer trivia → 70+ entries** — fokus på Kungsholmens västra (Stadshagen, Kristineberg) och mindre Söder-gator.
+E. **DELETE-policy i RLS** — bara för matching client_id, så users kan rensa sina egna rader. Edge function bättre.
+F. **Onboarding-toast** — första gången man landar i Fyll/Quiz, en kort introduktion.
 
 ## Kontaktytor
 

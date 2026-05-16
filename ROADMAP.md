@@ -10,14 +10,16 @@ Kärnan är geografisk igenkänning: gatans position, form och sammanhang måste
 
 ## Status nu
 
-- Fyra spellägen finns: Fyll i, Quiz, Tidspress och Lär-läge.
-- Kartan kör Leaflet med satellittiles och verkliga OSM-gator.
-- Overpass hämtas live när det går, cacheas i `localStorage` och faller tillbaka på `data/fallback-streets.js`.
-- `?fallback=1` tvingar lokal OSM-bundle och är det bästa testläget för stabil utveckling.
-- Quiz kan köras med tangentbord/diktering eller klick.
-- Fuzzy matching, ledtrådar, facit efter miss och lokal scratch-reveal finns i prototypform.
-- Hard mode använder hela bundlade OSM-urvalet; quiz rundar av till slumpade delomgångar.
-- Kart- och scratch-koden är uppdelad i mindre helpers; gammal scrape-logik är borttagen så nästa animationsrunda kan fokusera på den aktiva eraser-brush-revealen.
+- Fyra spellägen: Fyll i, Quiz (skriv/diktera/klick), Tidspress (val mellan 60/90/120/180 s) och Lär-läge med tre-stegs mastery per gata.
+- Kartan kör Leaflet med satellittiles, verkliga OSM-gator och eraser-brush-reveal som sveper ände-till-ände.
+- District-classification använder `place=island` polygoner för Kungsholmen/Stadsholmen/Södermalm och admin_level=10 för Norrmalm/Östermalm/Vasastan. Paper-overlay ritar kustlinje för 15 öar.
+- Overpass live + 30-dagars `localStorage`-cache + bundlad fallback (733 streets). `?fallback=1` tvingar bundle.
+- Trivia: 47 handkurerade entries (sv + en), visas i Lär-läge och i Results "Visste du?".
+- Lokal scoreboard per (district, mode) med PR och senaste 50 runor. Persisterar street mastery (0/1/2).
+- Profile-sida med all-stats, per-district PR, senaste 10 runor, export/import/reset.
+- Valfri Supabase-integration för global leaderboard. Setup via `supabase/schema.sql` + `data/remote-config.js`. Explicit submit-knapp i Results visar "plats X av Y" efter inskick.
+- 4/4 Node-unit-suites + 3/3 Playwright e2e gröna.
+- Kod uppdelad i `modes/`, `map/`, `screens/`, `data/` — inga filer >200 rader utöver genererade data-filer.
 
 ## Teknisk riktning
 
@@ -75,8 +77,9 @@ Målet med fasen är att göra projektet lätt att vidareutveckla utan att ändr
 
 ## Nästa bästa steg
 
-1. Slutför städpasset och verifiera att nuvarande spelbeteende fortfarande fungerar.
-2. Gör ett datapass för stadsdelspolygoner och bättre hantering av områdesklassning.
-3. Gör en UX-runda på rundinställningar, medaljer och replay-loop.
-4. Bygg vidare Playwright-smoken när fler verkliga spelvarv stabiliseras; Results/Share/Trivia täcks nu i fallback-läget.
-5. Planera Vite/ES-moduler först när statisk scriptordning blir ett verkligt hinder.
+1. Polera Fyll-läget: viewport-clamp på popover, tydligare ledtrådsövergång, snabbare reveal-tempo efter korrekt svar.
+2. Spaced repetition i Lär-läge — needs-work-streets prioriteras i nästa hovered/visnings-ordning.
+3. Player-onboarding: kort intro första gången ett spelläge öppnas.
+4. Mer trivia (mål 70+ entries) med fokus på västra Kungsholmen och Södermalm.
+5. Hosting: GitHub Pages eller Cloudflare Pages, custom domän via DNS. Pushen mot `origin/main` är gjord.
+6. Vite/ES-moduler först när statisk scriptordning eller saknad linting blir ett verkligt hinder.
