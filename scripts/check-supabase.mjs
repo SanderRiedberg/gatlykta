@@ -50,14 +50,9 @@ async function step(label, fn) {
 
 console.log(`Checking Supabase at ${url}…\n`);
 
-await step('reachable + auth', async () => {
-  const res = await fetch(`${url}/rest/v1/`, { headers });
-  if (!res.ok) throw new Error(`status ${res.status}`);
-  return `status ${res.status}`;
-});
-
 await step('gatlykta_scores table exists + RLS allows read', async () => {
   const res = await fetch(`${url}/rest/v1/gatlykta_scores?select=id&limit=1`, { headers });
+  if (res.status === 401) throw new Error('401 unauthorized — is the key valid? Use the publishable / anon key, not service_role.');
   if (res.status === 404) throw new Error('table not found — did you run supabase/schema.sql?');
   if (!res.ok) throw new Error(`status ${res.status}: ${await res.text()}`);
   const rows = await res.json();
