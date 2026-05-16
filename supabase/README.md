@@ -1,5 +1,29 @@
 # Supabase setup
 
+**Snabbaste vägen (cirka 2 min):**
+
+1. Gå till https://supabase.com/dashboard/projects → "New project"
+   - Namn: `gatlykta` (eller vad du vill)
+   - Region: closest, t.ex. `North EU (eu-north-1)`
+   - Generera ett databaspassword (du behöver det inte längre)
+   - Klicka "Create new project" och vänta ~60 sek
+2. När projektet är klart: vänster sidopanel → **SQL Editor** → New query.
+   Klistra in hela innehållet i [`schema.sql`](./schema.sql) och tryck Run.
+3. Vänster sidopanel → **Project Settings** → **API**.
+   Kopiera `Project URL` och `anon public` (NOT service_role).
+4. Öppna `data/remote-config.js` lokalt och fyll i:
+   ```js
+   window.SUPABASE_URL = 'https://abc123.supabase.co';
+   window.SUPABASE_ANON_KEY = 'eyJhbGciOi...';
+   ```
+5. Verifiera direkt: `node scripts/check-supabase.mjs`
+   Tre ✓-rader = klar. Ladda om sidan, spela en runda, kolla att en rad
+   dyker upp i `Table editor → gatlykta_scores`.
+
+Tre steg-djup beskrivning nedan om något skiter sig.
+
+---
+
 Three steps to enable global leaderboards:
 
 ## 1. Create the table

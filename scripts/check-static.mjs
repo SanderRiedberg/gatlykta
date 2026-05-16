@@ -48,6 +48,7 @@ for (const expected of [
   'screens/area-select.jsx',
   'screens/results.jsx',
   'screens/loading.jsx',
+  'screens/profile.jsx',
 ]) {
   if (!localScripts.includes(expected)) {
     fail(`index.html no longer loads expected script: ${expected}`);

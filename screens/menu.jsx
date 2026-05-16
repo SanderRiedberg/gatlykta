@@ -4,7 +4,7 @@
 (function () {
   const { TopBar } = window;
 
-  function ModeMenu({ t, onPickMode, lang, onLangChange, theme, onThemeChange }) {
+  function ModeMenu({ t, onPickMode, onProfile, lang, onLangChange, theme, onThemeChange }) {
     const modes = [
       { id: 'fill', key: 'mode.fill', desc: 'mode.fill_desc' },
       { id: 'quiz', key: 'mode.quiz', desc: 'mode.quiz_desc' },
@@ -15,6 +15,7 @@
       <div className="page">
         <TopBar t={t} onHome={() => {}} right={
           <span>
+            {onProfile && <><button className="btn-link" onClick={onProfile}>{t('profile.title')}</button>{' · '}</>}
             <button className="btn-link" onClick={() => onLangChange(lang === 'sv' ? 'en' : 'sv')}>{lang === 'sv' ? 'EN' : 'SV'}</button>
             {' · '}
             <button className="btn-link" onClick={() => onThemeChange(theme === 'dark' ? 'paper' : 'dark')}>{theme === 'dark' ? '☼' : '☾'}</button>

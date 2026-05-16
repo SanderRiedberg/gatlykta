@@ -52,6 +52,7 @@ function App() {
   const [view, setView] = useSa({ name: 'menu' });
 
   const goMenu = () => setView({ name: 'menu' });
+  const goProfile = () => setView({ name: 'profile' });
   const pickMode = (modeId) => setView({ name: 'area', modeId });
   const pickArea = (districtIds, focusDistrict) => setView({ name: 'play', modeId: view.modeId, districtIds, focusDistrict });
   const pickAll = () => setView({ name: 'play', modeId: view.modeId, districtIds: null, focusDistrict: null });
@@ -63,9 +64,12 @@ function App() {
   if (!streets) return <LoadingScreen t={t} stage={loadStage} />;
 
   if (view.name === 'menu') {
-    return <ModeMenu t={t} onPickMode={pickMode}
+    return <ModeMenu t={t} onPickMode={pickMode} onProfile={goProfile}
       lang={tweaks.lang || 'sv'} onLangChange={(l) => setTweak('lang', l)}
       theme={tweaks.theme || 'paper'} onThemeChange={(th) => setTweak('theme', th)} />;
+  }
+  if (view.name === 'profile') {
+    return <Profile t={t} streets={streets} onBack={goMenu} />;
   }
   if (view.name === 'area') {
     return <AreaSelect t={t} modeId={view.modeId} streets={streets}
