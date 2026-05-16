@@ -42,6 +42,12 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-16 — Claude (profile-sida + Supabase-verifiering)
+- `screens/profile.jsx`: ny top-level vy med overall mastery, per-district cards (best per mode), senaste 10 rundor, export/import/reset-knappar. Nås via Profil-länk i ModeMenu topbar (`02b003f`).
+- `scripts/check-supabase.mjs`: läser `data/remote-config.js`, hittar URL+key, hits 3 endpoints för att verifiera auth/tabell/RLS. Skriver en `__smoke__`-row som kan rensas med one-liner i SQL editor.
+- `supabase/README.md` uppdaterad med 5-stegs snabb-setup (skapa projekt → kör schema → kopiera credentials → klistra in → kör check-script).
+- Sander har Supabase-konto. Setup: ~2 min manuell, sen funkar leaderboards.
+
 ### 2026-05-16 — Claude (rundinställningar, scoreboards, Supabase, mobil-HUD)
 Stort produktiv pass triggat av Sanders "kör på i 40 min"-fönster:
 - TimeMode tidsval (60/90/120/180s) på area-select, persistas i useTweaks (`f6084b6`).
