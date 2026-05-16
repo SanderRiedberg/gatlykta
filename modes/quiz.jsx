@@ -10,9 +10,15 @@
     LeafletMap,
   } = window;
 
-  function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, onFinish, onQuit }) {
+  function QuizMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, quizRoundSize: roundOverride, onFinish, onQuit }) {
     const active = useM(() => streetsForDistricts(streets, districtIds, difficulty), [streets, districtIds, difficulty]);
-    const queue = useM(() => shuffleStreets(active).slice(0, quizRoundSize(difficulty, active.length)), [active, difficulty]);
+    const queue = useM(() => {
+      const overrideMap = { short: 10, normal: 20, long: 40 };
+      const size = (roundOverride && overrideMap[roundOverride])
+        ? Math.min(overrideMap[roundOverride], active.length)
+        : quizRoundSize(difficulty, active.length);
+      return shuffleStreets(active).slice(0, size);
+    }, [active, difficulty, roundOverride]);
     const [idx, setIdx] = useS(0);
     const [answerMode, setAnswerMode] = useS('type');
     const [answer, setAnswer] = useS('');

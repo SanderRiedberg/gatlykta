@@ -5,7 +5,7 @@
   const { useState: useS, useMemo: useM } = React;
   const { TopBar, Stars, LeafletMap, bestStars } = window;
 
-  function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, onMapStyle, timeLimit, onTimeLimit, onPick, onPickAll, onBack }) {
+  function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, onMapStyle, timeLimit, onTimeLimit, quizRoundSize, onQuizRoundSize, onPick, onPickAll, onBack }) {
     const [focusId, setFocusId] = useS(null); // null = whole city, all districts visible
     const filtered = useM(() => window.filterByDifficulty ? window.filterByDifficulty(streets, difficulty) : streets, [streets, difficulty]);
     const counts = useM(() => {
@@ -62,6 +62,19 @@
                       <button key={v} className={`diff ${timeLimit === v ? 'on' : ''}`} onClick={() => onTimeLimit && onTimeLimit(v)}>
                         <span className="name">{v}s</span>
                         <span className="sub">{t(`time.duration_${v}`)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {modeId === 'quiz' && (
+                <>
+                  <div className="eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>{t('quiz.round_label')}</div>
+                  <div className="diff-row">
+                    {['auto', 'short', 'normal', 'long'].map(v => (
+                      <button key={v} className={`diff ${quizRoundSize === v ? 'on' : ''}`} onClick={() => onQuizRoundSize && onQuizRoundSize(v)}>
+                        <span className="name">{t(`quiz.round_${v}`)}</span>
+                        <span className="sub">{t(`quiz.round_${v}_sub`)}</span>
                       </button>
                     ))}
                   </div>

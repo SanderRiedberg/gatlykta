@@ -75,6 +75,8 @@ function App() {
       onMapStyle={(s) => setTweak('mapStyle', s)}
       timeLimit={Number(tweaks.timeLimit) || 90}
       onTimeLimit={(v) => setTweak('timeLimit', v)}
+      quizRoundSize={tweaks.quizRoundSize || 'auto'}
+      onQuizRoundSize={(v) => setTweak('quizRoundSize', v)}
       onPick={pickArea} onPickAll={pickAll} onBack={goMenu} />;
   }
   if (view.name === 'play') {
@@ -83,6 +85,7 @@ function App() {
       difficulty={tweaks.difficulty || 'easy'} mapStyle={tweaks.mapStyle || 'sketch'}
       lang={tweaks.lang || 'sv'}
       timeLimit={Number(tweaks.timeLimit) || 90}
+      quizRoundSize={tweaks.quizRoundSize || 'auto'}
       onFinish={finish} onQuit={pickAreaAgain} />;
   }
   if (view.name === 'results') {
