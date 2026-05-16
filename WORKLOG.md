@@ -42,6 +42,15 @@ Triggered by Sander testing live on `?fallback=1`:
 - Multi-way streets animerades parallellt: `drawEraserBrush` tar nu en paths-lista och flattnar till en enda segment-sekvens, så sweepen går ände-till-ände (`7d1be3b`).
 - Learn-panelen låg på Leaflet zoom-controls: flyttad till top-right på desktop, top-stretched på mobile (`3b393cd`).
 
+### 2026-05-16 — Claude (rundinställningar, scoreboards, Supabase, mobil-HUD)
+Stort produktiv pass triggat av Sanders "kör på i 40 min"-fönster:
+- TimeMode tidsval (60/90/120/180s) på area-select, persistas i useTweaks (`f6084b6`).
+- Trivia 29 → 47 entries (Olof Palmes gata, Tunnelgatan, Stortorget m.fl.) + distinkta map-stilar med streetColor/paperTint per preset (sketch neutral, lithograph sepia, cartoon bold med halo, minimalism hårfin, popart blå-på-gult) (`cf93d34`).
+- Quiz round-size val (auto/10/20/40) på area-select, override default-mapping (`ed2b0fa`).
+- `data/storage.js`: lokal abstraktion för scores + street mastery + import/export-snapshot, med stub-block för remote sync. Lär-läge bygger nu om kring 3-stegs mastery (0/1/2), HUD visar known + review counts, klick på gata toggle:r mastery, två separata knappar för "kan denna"/"behöver öva". Area-select visar PR-poäng per district per mode (`1b1636d`).
+- Supabase-integration: `data/remote-sync.js` (klient med graceful no-op om credentials saknas), `supabase/schema.sql` (table + RLS + top10-view), `supabase/README.md` (3-stegs setup). `data/storage.js` recordScore fire-and-forgets push-anrop. Local-only-mode oförändrad (`a5d6c9d`).
+- Results-skärm leaderboard-sektion (top 10 från Supabase om configured), player-name-input som persistas. Mobile-HUD-polering under 600px: kompaktare pills, wrappable actions-row (`e63297e`).
+
 ### 2026-05-13 — Claude (öar som districts + coastline + quiz auto-zoom)
 Triggered by Sander testing the district polygons live:
 - Kungsholmen-halva-buggen: admin_level=10 "Kungsholmen" är bara östra halvan (resten är Stadshagen/Kristineberg). Bytt till `place=island` polygon för Kungsholmen, Stadsholmen och Södermalm; admin behållen för Norrmalm/Östermalm/Vasastan. Kungsholmen 41 → 227 polygon-punkter (hela ön). Bundle 656 → 733 streets (`940ff55`).
