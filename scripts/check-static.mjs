@@ -26,6 +26,7 @@ for (const expected of [
   'data/city-stockholm.js',
   'data/district-polygons.js',
   'data/coastline.js',
+  'data/storage.js',
   'game-utils.jsx',
   'data/osm-pipeline.js',
   'data/osm.js',

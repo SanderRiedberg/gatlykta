@@ -201,7 +201,11 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .learn-panel .name { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-bottom: 6px; }
 .learn-panel .meta { font-size: 12px; color: var(--ink-3); font-family: var(--mono); }
 .learn-panel .help { font-size: 13px; color: var(--ink-3); }
+.area-row .meta .pr { color: var(--accent-deep); font-weight: 500; }
 .learn-panel .learn-trivia { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--paper-line); font-family: var(--serif); font-style: italic; }
+.learn-panel .learn-mastery { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.learn-panel .learn-mastery .btn { font-size: 12px; padding: 6px 10px; }
+.learn-panel .learn-mastery .btn.warn { border-color: var(--warn); color: var(--warn); }
 
 .results-trivia { margin-top: 22px; }
 .trivia-card { background: color-mix(in srgb, var(--bg-card) 92%, var(--ink) 8%); border: 1px solid var(--paper-line); border-left: 3px solid var(--accent); border-radius: var(--r); padding: 10px 14px; margin-top: 8px; }

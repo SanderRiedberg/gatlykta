@@ -33,12 +33,16 @@
             <div className="area-list">
               {DISTRICTS.map((d, i) => {
                 const stars = bestStars(d.id);
+                const scoreData = window.getScoresFor && window.getScoresFor(d.id, modeId);
+                const best = scoreData && scoreData.best;
                 return (
                   <button key={d.id} className={`area-row ${focusId === d.id ? 'active' : ''}`}
                     onClick={() => setFocusId(d.id)} onDoubleClick={() => onPick([d.id], d.id)}>
                     <span className="idx">{(i + 1).toString().padStart(2, '0')}</span>
                     <span className="name">{d.name}</span>
-                    <span className="meta">{counts[d.id] || 0} · <Stars count={stars} /></span>
+                    <span className="meta">{counts[d.id] || 0} · <Stars count={stars} />
+                      {best && (best.points > 0 || best.correct > 0) && <span className="pr"> · {best.points ? `${best.points}p` : `${best.correct}/${best.total}`}</span>}
+                    </span>
                   </button>
                 );
               })}

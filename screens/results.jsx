@@ -119,7 +119,25 @@
       setFlash({ tone: 'warn', text: t('results.share_unavailable') });
     }, [t, result, areaName, stars]);
 
-    useE(() => { if (districtIds) districtIds.forEach(id => recordResult(id, result.mode, stars)); }, []);
+    useE(() => {
+      if (districtIds) districtIds.forEach(id => recordResult(id, result.mode, stars));
+      // Detailed scoreboard: one record per round per primary district.
+      // For "all districts" rounds we record under the synthetic id 'all'.
+      if (window.recordScore) {
+        const targetIds = districtIds && districtIds.length ? districtIds : [null];
+        for (const id of targetIds) {
+          window.recordScore({
+            districtId: id || 'all',
+            mode: result.mode,
+            points: result.points,
+            correct: result.correct,
+            total: result.total,
+            timeSec: result.time,
+            stars,
+          });
+        }
+      }
+    }, []);
 
     return (
       <div className="page">
