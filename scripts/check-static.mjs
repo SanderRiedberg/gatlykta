@@ -27,6 +27,8 @@ for (const expected of [
   'data/district-polygons.js',
   'data/coastline.js',
   'data/storage.js',
+  'data/remote-config.js',
+  'data/remote-sync.js',
   'game-utils.jsx',
   'data/osm-pipeline.js',
   'data/osm.js',

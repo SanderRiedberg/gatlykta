@@ -1,4 +1,5 @@
 .DS_Store
+data/remote-config.js
 .playwright-cli/
 node_modules/
 dist/

@@ -51,6 +51,10 @@
     if (score > bestScore) existing.best = entry;
     all[k] = existing;
     safeSet(KEYS.SCORES, all);
+    // Fire-and-forget remote sync if a Supabase backend is configured.
+    if (window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.isConfigured()) {
+      try { window.gatlyktaRemoteSync.pushScore({ districtId, mode, points, correct, total, timeSec, stars: entry.stars }); } catch {}
+    }
     return existing;
   }
 
