@@ -144,8 +144,8 @@
 
     useE(() => {
       if (districtIds) districtIds.forEach(id => recordResult(id, result.mode, stars));
-      // Detailed scoreboard: one record per round per primary district.
-      // For "all districts" rounds we record under the synthetic id 'all'.
+      // Local-only record on mount. Remote submission is explicit via the
+      // leaderboard submit button so the player can set a name first.
       if (window.recordScore) {
         const targetIds = districtIds && districtIds.length ? districtIds : [null];
         for (const id of targetIds) {
@@ -157,10 +157,38 @@
             total: result.total,
             timeSec: result.time,
             stars,
+            skipRemote: true,
           });
         }
       }
     }, []);
+
+    const [submitState, setSubmitState] = useS('idle'); // idle | submitting | done | error
+    const handleSubmitScore = useC(async () => {
+      if (!remoteEnabled || submitState === 'submitting' || submitState === 'done') return;
+      setSubmitState('submitting');
+      const targetIds = districtIds && districtIds.length ? districtIds : [null];
+      let allOk = true;
+      for (const id of targetIds) {
+        const ok = await window.gatlyktaRemoteSync.pushScore({
+          districtId: id || 'all',
+          mode: result.mode,
+          points: result.points,
+          correct: result.correct,
+          total: result.total,
+          timeSec: result.time,
+          stars,
+        });
+        if (!ok) allOk = false;
+      }
+      setSubmitState(allOk ? 'done' : 'error');
+      // Refetch so the new row shows up
+      if (allOk) {
+        const id = (districtIds && districtIds.length === 1) ? districtIds[0] : 'all';
+        const rows = await window.gatlyktaRemoteSync.fetchLeaderboard(id, result.mode, 10);
+        if (Array.isArray(rows)) setLeaderboard(rows);
+      }
+    }, [remoteEnabled, submitState, districtIds, result, stars]);
 
     return (
       <div className="page">
@@ -215,7 +243,15 @@
               <div className="leaderboard-name">
                 <label>{t('results.player_name')}</label>
                 <input value={playerName} onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder={t('results.player_name_placeholder')} maxLength={32} />
+                  placeholder={t('results.player_name_placeholder')} maxLength={32}
+                  disabled={submitState === 'submitting' || submitState === 'done'} />
+                <button type="button" className="btn small" onClick={handleSubmitScore}
+                  disabled={submitState === 'submitting' || submitState === 'done'}>
+                  {submitState === 'submitting' ? t('results.submitting')
+                    : submitState === 'done' ? t('results.submitted')
+                    : submitState === 'error' ? t('results.submit_retry')
+                    : t('results.submit')}
+                </button>
               </div>
               {leaderboard === null && <div className="meta">{t('results.leaderboard_loading')}</div>}
               {leaderboard && leaderboard.length === 0 && <div className="meta">{t('results.leaderboard_empty')}</div>}

@@ -28,7 +28,7 @@
     return districtId ? `${districtId}::${mode}` : `all::${mode}`;
   }
 
-  function recordScore({ districtId, mode, points, correct, total, timeSec, stars, when }) {
+  function recordScore({ districtId, mode, points, correct, total, timeSec, stars, when, skipRemote }) {
     if (!mode) return null;
     const all = safeGet(KEYS.SCORES, {});
     const k = scoreKey(districtId, mode);
@@ -51,8 +51,10 @@
     if (score > bestScore) existing.best = entry;
     all[k] = existing;
     safeSet(KEYS.SCORES, all);
-    // Fire-and-forget remote sync if a Supabase backend is configured.
-    if (window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.isConfigured()) {
+    // Fire-and-forget remote sync if a Supabase backend is configured and the
+    // caller wants it. Results screen passes skipRemote so submission is
+    // explicit (user picks a name first).
+    if (!skipRemote && window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.isConfigured()) {
       try { window.gatlyktaRemoteSync.pushScore({ districtId, mode, points, correct, total, timeSec, stars: entry.stars }); } catch {}
     }
     return existing;
