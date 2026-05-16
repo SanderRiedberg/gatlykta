@@ -162,6 +162,12 @@ const I18N = {
     'learn.mark_unknown': 'Behöver öva mer',
     'learn.known_label': 'Inlärda',
     'learn.review_label': 'Att öva på',
+    'results.leaderboard': 'Topplista',
+    'results.leaderboard_loading': 'Hämtar resultat …',
+    'results.leaderboard_empty': 'Inga inskickade resultat än för det här området.',
+    'results.player_name': 'Visa som',
+    'results.player_name_placeholder': 'Ditt namn (valfritt)',
+    'results.player_anonymous': 'Anonym',
   },
   en: {
     'app.tagline': 'Learn your city, one street at a time.',
@@ -323,6 +329,12 @@ const I18N = {
     'learn.mark_unknown': 'Need more practice',
     'learn.known_label': 'Learned',
     'learn.review_label': 'To review',
+    'results.leaderboard': 'Leaderboard',
+    'results.leaderboard_loading': 'Fetching scores …',
+    'results.leaderboard_empty': 'No submitted scores yet for this area.',
+    'results.player_name': 'Show as',
+    'results.player_name_placeholder': 'Your name (optional)',
+    'results.player_anonymous': 'Anonymous',
   }
 };
 

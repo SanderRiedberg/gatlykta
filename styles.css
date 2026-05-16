@@ -202,6 +202,34 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .learn-panel .meta { font-size: 12px; color: var(--ink-3); font-family: var(--mono); }
 .learn-panel .help { font-size: 13px; color: var(--ink-3); }
 .area-row .meta .pr { color: var(--accent-deep); font-weight: 500; }
+.results-leaderboard { margin-top: 22px; padding: 12px 14px; border: 1px solid var(--paper-line); border-radius: var(--r); background: var(--bg-card); }
+.leaderboard-name { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; font-size: 13px; }
+.leaderboard-name label { color: var(--ink-3); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+.leaderboard-name input { flex: 1; background: transparent; border: 0; border-bottom: 1px solid var(--paper-line); padding: 4px 0; color: var(--ink); font-family: var(--sans); font-size: 14px; outline: none; }
+.leaderboard-name input:focus { border-bottom-color: var(--accent); }
+.leaderboard-list { list-style: none; padding: 0; margin: 0; }
+.leaderboard-list li { display: grid; grid-template-columns: 28px 1fr auto; align-items: baseline; gap: 10px; padding: 5px 0; border-top: 1px dashed color-mix(in srgb, var(--paper-line) 70%, transparent); font-size: 13px; }
+.leaderboard-list li:first-child { border-top: 0; }
+.leaderboard-list .rank { font-family: var(--mono); color: var(--ink-3); font-size: 11px; }
+.leaderboard-list .who { color: var(--ink); }
+.leaderboard-list .score { font-family: var(--mono); color: var(--accent-deep); font-weight: 500; }
+
+@media (max-width: 600px) {
+  .game-hud { padding: 6px 10px; gap: 6px; }
+  .hud-mode { font-size: 14px; }
+  .hud-area { display: none; }
+  .hud-left .btn.small { font-size: 12px; padding: 6px 10px; }
+  .hud-left > div:nth-child(2) { display: none; }
+  .hud-pill { padding: 4px 8px; }
+  .hud-pill .k { display: none; }
+  .hud-pill .v { font-size: 13px; }
+  .hud-pill .v.big { font-size: 16px; }
+  .hud-progress .bar { width: 60px; }
+  .results-leaderboard { padding: 10px 12px; }
+  .leaderboard-list li { grid-template-columns: 22px 1fr auto; gap: 6px; font-size: 12px; }
+  .actions-row { flex-wrap: wrap; gap: 8px; }
+  .actions-row .btn { font-size: 12px; padding: 9px 12px; }
+}
 .learn-panel .learn-trivia { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--paper-line); font-family: var(--serif); font-style: italic; }
 .learn-panel .learn-mastery { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
 .learn-panel .learn-mastery .btn { font-size: 12px; padding: 6px 10px; }

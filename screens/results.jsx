@@ -100,6 +100,29 @@
       return { district: districtText, districtName, streets: matches };
     }, [districtIds, solvedItems, missedItems, lang]);
 
+    // ─── Global leaderboard (Supabase, optional) ──────────────────────
+    const remoteEnabled = !!(window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.isConfigured && window.gatlyktaRemoteSync.isConfigured());
+    const [leaderboard, setLeaderboard] = useS(null);
+    const [playerName, setPlayerName] = useS(() => {
+      try { return (window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.playerName()) || ''; } catch { return ''; }
+    });
+    useE(() => {
+      if (!remoteEnabled) return;
+      const id = (districtIds && districtIds.length === 1) ? districtIds[0] : 'all';
+      let cancelled = false;
+      window.gatlyktaRemoteSync.fetchLeaderboard(id, result.mode, 10).then(rows => {
+        if (!cancelled) setLeaderboard(Array.isArray(rows) ? rows : []);
+      });
+      return () => { cancelled = true; };
+    }, [districtIds, result.mode, remoteEnabled]);
+    const handleNameChange = useC((next) => {
+      const trimmed = String(next || '').slice(0, 32);
+      setPlayerName(trimmed);
+      if (window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.setPlayerName) {
+        window.gatlyktaRemoteSync.setPlayerName(trimmed);
+      }
+    }, []);
+
     const [flash, setFlash] = useS(null);
     const handleShare = useC(async () => {
       const modeName = t(`mode.${result.mode}`);
@@ -186,7 +209,30 @@
                 ))}
               </div>
             )}
-            <div className="actions-row" style={{ marginTop: 28 }}>
+            {remoteEnabled && (
+            <div className="results-leaderboard">
+              <div className="eyebrow">{t('results.leaderboard')}</div>
+              <div className="leaderboard-name">
+                <label>{t('results.player_name')}</label>
+                <input value={playerName} onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder={t('results.player_name_placeholder')} maxLength={32} />
+              </div>
+              {leaderboard === null && <div className="meta">{t('results.leaderboard_loading')}</div>}
+              {leaderboard && leaderboard.length === 0 && <div className="meta">{t('results.leaderboard_empty')}</div>}
+              {leaderboard && leaderboard.length > 0 && (
+                <ol className="leaderboard-list">
+                  {leaderboard.map((row, i) => (
+                    <li key={i}>
+                      <span className="rank">{i + 1}</span>
+                      <span className="who">{row.player_name || t('results.player_anonymous')}</span>
+                      <span className="score">{row.points != null ? `${row.points}p` : `${row.correct}/${row.total}`}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
+          <div className="actions-row" style={{ marginTop: 28 }}>
               <button className="btn" onClick={onPlayAgain}>↻ {t('results.again')}</button>
               <button className="btn ghost" onClick={onPickArea}>{t('results.pick_area')}</button>
               <button className="btn ghost" onClick={onHome}>{t('results.try_another')}</button>
