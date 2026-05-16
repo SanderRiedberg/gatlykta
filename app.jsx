@@ -73,6 +73,8 @@ function App() {
       onDifficulty={(d) => setTweak('difficulty', d)}
       mapStyle={tweaks.mapStyle || 'sketch'}
       onMapStyle={(s) => setTweak('mapStyle', s)}
+      timeLimit={Number(tweaks.timeLimit) || 90}
+      onTimeLimit={(v) => setTweak('timeLimit', v)}
       onPick={pickArea} onPickAll={pickAll} onBack={goMenu} />;
   }
   if (view.name === 'play') {
@@ -80,6 +82,7 @@ function App() {
     return <Mode t={t} streets={streets} districtIds={view.districtIds} focusDistrict={view.focusDistrict}
       difficulty={tweaks.difficulty || 'easy'} mapStyle={tweaks.mapStyle || 'sketch'}
       lang={tweaks.lang || 'sv'}
+      timeLimit={Number(tweaks.timeLimit) || 90}
       onFinish={finish} onQuit={pickAreaAgain} />;
   }
   if (view.name === 'results') {

@@ -5,7 +5,7 @@
   const { useState: useS, useMemo: useM } = React;
   const { TopBar, Stars, LeafletMap, bestStars } = window;
 
-  function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, onMapStyle, onPick, onPickAll, onBack }) {
+  function AreaSelect({ t, modeId, streets, difficulty, onDifficulty, mapStyle, onMapStyle, timeLimit, onTimeLimit, onPick, onPickAll, onBack }) {
     const [focusId, setFocusId] = useS(null); // null = whole city, all districts visible
     const filtered = useM(() => window.filterByDifficulty ? window.filterByDifficulty(streets, difficulty) : streets, [streets, difficulty]);
     const counts = useM(() => {
@@ -54,6 +54,19 @@
                   </button>
                 ))}
               </div>
+              {modeId === 'time' && (
+                <>
+                  <div className="eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>{t('time.duration_label')}</div>
+                  <div className="diff-row">
+                    {[60, 90, 120, 180].map(v => (
+                      <button key={v} className={`diff ${timeLimit === v ? 'on' : ''}`} onClick={() => onTimeLimit && onTimeLimit(v)}>
+                        <span className="name">{v}s</span>
+                        <span className="sub">{t(`time.duration_${v}`)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
               <div className="eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>{t('style.label')}</div>
               <div className="style-row">
                 {['sketch', 'lithograph', 'cartoon', 'minimalism', 'popart'].map(s => (

@@ -9,8 +9,8 @@
     LeafletMap, GuessPop,
   } = window;
 
-  function TimeMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, onFinish, onQuit }) {
-    const LIMIT = 90;
+  function TimeMode({ t, streets, districtIds, focusDistrict, difficulty, mapStyle, timeLimit, onFinish, onQuit }) {
+    const LIMIT = Number(timeLimit) > 0 ? Number(timeLimit) : 90;
     const active = useM(() => streetsForDistricts(streets, districtIds, difficulty), [streets, districtIds, difficulty]);
     const [solvedIds, setSolvedIds] = useS(() => new Set());
     const [wrongMap, setWrongMap] = useS({});

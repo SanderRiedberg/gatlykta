@@ -144,6 +144,11 @@ const I18N = {
 
     'trivia.heading': 'Visste du?',
     'learn.pin_hint': 'Klicka för att pinna gator du har lärt dig.',
+    'time.duration_label': 'Tidsgräns',
+    'time.duration_60': 'kort sprint',
+    'time.duration_90': 'standard',
+    'time.duration_120': 'lugnare',
+    'time.duration_180': 'lång runda',
   },
   en: {
     'app.tagline': 'Learn your city, one street at a time.',
@@ -287,6 +292,11 @@ const I18N = {
 
     'trivia.heading': 'Did you know?',
     'learn.pin_hint': 'Click to pin streets you have learned.',
+    'time.duration_label': 'Time limit',
+    'time.duration_60': 'sprint',
+    'time.duration_90': 'standard',
+    'time.duration_120': 'relaxed',
+    'time.duration_180': 'long round',
   }
 };
 
