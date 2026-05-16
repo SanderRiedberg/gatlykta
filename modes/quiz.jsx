@@ -32,6 +32,7 @@
     const [flash, setFlash] = useS(null);
     const [startTime] = useS(() => Date.now());
     const [, force] = useS(0);
+    const [finishing, setFinishing] = useS(false);
     const inputRef = useR(null);
     const speechRef = useR(null);
     const triesRef = useR(0);
@@ -64,7 +65,8 @@
       if (idx + 1 >= queue.length) {
         const elapsed = Math.round((Date.now() - startTime) / 1000);
         const roundIds = queue.map(s => s.id);
-        onFinish({ mode: 'quiz', total: queue.length, correct: solvedSet.size, missed: queue.length - solvedSet.size, time: elapsed, bestStreak: best, solvedIds: [...solvedSet], revealedIds: [...missedSet], roundIds });
+        setFinishing(true);
+        setTimeout(() => onFinish({ mode: 'quiz', total: queue.length, correct: solvedSet.size, missed: queue.length - solvedSet.size, time: elapsed, bestStreak: best, solvedIds: [...solvedSet], revealedIds: [...missedSet], roundIds }), 1600);
         return;
       }
       triesRef.current = 0;
@@ -182,7 +184,7 @@
           </div>
         </div>
         <div className="map-stage">
-          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} focusStreet={answerMode === 'type' ? target : null} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={queue.length ? solvedIds.size/queue.length : (active.length ? solvedIds.size/active.length : 0)} />
+          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} focusStreet={answerMode === 'type' ? target : null} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={queue.length ? solvedIds.size/queue.length : (active.length ? solvedIds.size/active.length : 0)} revealAll={finishing} />
           {target && (
             <div className={`quiz-prompt ${answerMode === 'type' ? 'typed' : ''}`}>
               <div className="quiz-switch" role="group" aria-label={t('quiz.mode_label')}>

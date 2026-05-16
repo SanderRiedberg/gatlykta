@@ -14,10 +14,22 @@ function removeScratchOverlay(canvas) {
   if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
 }
 
-function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetStates, mapStyle, progress }) {
+function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetStates, mapStyle, progress, revealAll }) {
   if (!map || !canvas) return () => {};
   const paperColor = () => (getComputedStyle(document.documentElement).getPropertyValue('--paper-color').trim() || '#f4ebd9');
   const inkColor = () => (getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1f1a14');
+
+  // Paper fades the more you complete: opacity 1 at 0% progress, ~0.35 at
+  // 100%. The grand reveal at round end pushes it all the way to 0 with a
+  // slower transition (controlled in CSS via the .revealing-all class).
+  const p = Math.max(0, Math.min(1, progress || 0));
+  if (revealAll) {
+    canvas.classList.add('revealing-all');
+    canvas.style.opacity = '0';
+  } else {
+    canvas.classList.remove('revealing-all');
+    canvas.style.opacity = String(Math.max(0.35, 1 - p * 0.65));
+  }
 
   let reveals = {};
   let raf = null;
@@ -81,12 +93,13 @@ function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetSta
     if (zooming) return;
     if (!raf) raf = requestAnimationFrame(() => { raf = null; draw(); });
   };
+  const targetOpacity = () => revealAll ? '0' : String(Math.max(0.35, 1 - p * 0.65));
   const onZoomStart = () => { zooming = true; canvas.style.opacity = '0'; };
   const onZoomEnd = () => {
     zooming = false;
     if (raf) { cancelAnimationFrame(raf); raf = null; }
     draw();
-    canvas.style.opacity = '1';
+    canvas.style.opacity = targetOpacity();
   };
 
   map.on('drag dragend move moveend resize viewreset', trigger);

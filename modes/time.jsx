@@ -20,6 +20,7 @@
     const [streak, setStreak] = useS(0);
     const [bestStreak, setBestStreak] = useS(0);
     const [, force] = useS(0);
+    const [finishing, setFinishing] = useS(false);
     const startRef = useR(Date.now());
     const wrapRef = useR(null);
     const inputRef = useR(null);
@@ -33,7 +34,8 @@
     useE(() => {
       if (remaining <= 0 && !doneRef.current) {
         doneRef.current = true;
-        setTimeout(() => onFinish({ mode: 'time', total: active.length, correct: solvedIds.size, missed: active.length - solvedIds.size, time: LIMIT, bestStreak, solvedIds: [...solvedIds], revealedIds: [] }), 200);
+        setFinishing(true);
+        setTimeout(() => onFinish({ mode: 'time', total: active.length, correct: solvedIds.size, missed: active.length - solvedIds.size, time: LIMIT, bestStreak, solvedIds: [...solvedIds], revealedIds: [] }), 1600);
       }
     }, [remaining, solvedIds, bestStreak, active.length, onFinish]);
 
@@ -53,7 +55,8 @@
       if (n.size >= active.length && !doneRef.current) {
         doneRef.current = true;
         const elapsedNow = Math.floor((Date.now() - startRef.current) / 1000);
-        setTimeout(() => onFinish({ mode: 'time', total: active.length, correct: n.size, missed: 0, time: elapsedNow, bestStreak: Math.max(bestStreak, streak + 1), solvedIds: [...n], revealedIds: [] }), 600);
+        setFinishing(true);
+        setTimeout(() => onFinish({ mode: 'time', total: active.length, correct: n.size, missed: 0, time: elapsedNow, bestStreak: Math.max(bestStreak, streak + 1), solvedIds: [...n], revealedIds: [] }), 1600);
       }
     }, [selected, solvedIds, t, active.length, onFinish, bestStreak, streak]);
 
@@ -78,7 +81,7 @@
           </div>
         </div>
         <div className="map-stage" ref={wrapRef}>
-          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={active.length ? solvedIds.size/active.length : 0} />
+          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={states} onStreetClick={handleClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={active.length ? solvedIds.size/active.length : 0} revealAll={finishing} />
           {selected && popPos && (
             <GuessPop t={t} pos={popPos} street={selected.street} wrongCount={wrongMap[selected.street.id] || 0}
               onCorrect={handleCorrect} onWrong={handleWrong}

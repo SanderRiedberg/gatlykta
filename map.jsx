@@ -25,6 +25,7 @@ function LeafletMap({
   scratch = true,
   mapStyle = 'sketch',
   progress = 0,
+  revealAll = false,
 }) {
   const containerRef = useRm(null);
   const mapRef = useRm(null);
@@ -85,8 +86,9 @@ function LeafletMap({
       streetStates,
       mapStyle,
       progress,
+      revealAll,
     });
-  }, [scratch, streetStates, streets, activeDistricts, mapStyle, progress]);
+  }, [scratch, streetStates, streets, activeDistricts, mapStyle, progress, revealAll]);
 
   useEm(() => {
     renderStreetLabels({

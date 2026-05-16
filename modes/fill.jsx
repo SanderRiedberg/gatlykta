@@ -25,6 +25,7 @@
     const wrapRef = useR(null);
     const inputRef = useR(null);
     const [, force] = useS(0);
+    const [finishing, setFinishing] = useS(false);
     useE(() => { const id = setInterval(() => force(t => t + 1), 1000); return () => clearInterval(id); }, []);
     useE(() => { if (selected && inputRef.current) inputRef.current.focus(); }, [selected]);
 
@@ -68,7 +69,8 @@
       setFeedback({ tone: 'ok', text });
       if (next.size + nextRevealed.size >= total) {
         const elapsed = Math.round((Date.now() - startTime) / 1000);
-        setTimeout(() => onFinish({ mode: 'fill', total, correct: next.size, missed: total - next.size, time: elapsed, bestStreak: Math.max(bestStreak, streak + 1), points: nextPoints, solvedIds: [...next], revealedIds: [...nextRevealed] }), 700);
+        setFinishing(true);
+        setTimeout(() => onFinish({ mode: 'fill', total, correct: next.size, missed: total - next.size, time: elapsed, bestStreak: Math.max(bestStreak, streak + 1), points: nextPoints, solvedIds: [...next], revealedIds: [...nextRevealed] }), 1600);
       }
     }, [selected, wrongMap, hintMap, points, solvedIds, total, t, onFinish, bestStreak, streak, startTime, revealedIds]);
 
@@ -109,7 +111,8 @@
       const id = selected.street.id;
       if (solvedIds.size + next.size >= total) {
         const elapsed = Math.round((Date.now() - startTime) / 1000);
-        setTimeout(() => onFinish({ mode: 'fill', total, correct: solvedIds.size, missed: total - solvedIds.size, time: elapsed, bestStreak, points, solvedIds: [...solvedIds], revealedIds: [...next] }), 900);
+        setFinishing(true);
+        setTimeout(() => onFinish({ mode: 'fill', total, correct: solvedIds.size, missed: total - solvedIds.size, time: elapsed, bestStreak, points, solvedIds: [...solvedIds], revealedIds: [...next] }), 1800);
       } else {
         setTimeout(() => { setSelected(s => (s && s.street.id === id) ? null : s); setPopPos(null); }, 1100);
       }
@@ -133,7 +136,7 @@
           </div>
         </div>
         <div className="map-stage" ref={wrapRef}>
-          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={streetStates} onStreetClick={handleStreetClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={total ? completed/total : 0} />
+          <LeafletMap streets={active} activeDistricts={districtIds} focusDistrict={focusDistrict} streetStates={streetStates} onStreetClick={handleStreetClick} showLabels showSolvedLabels mapStyle={mapStyle} progress={total ? completed/total : 0} revealAll={finishing} />
           {selected && popPos && (
             <GuessPop t={t} pos={popPos} street={selected.street} wrongCount={wrongMap[selected.street.id] || 0}
               hint={hintMap[selected.street.id] ? currentHint : null} onHint={handleHint}
