@@ -179,6 +179,79 @@ const STREET_TRIVIA = {
     sv: 'Stockholms äldsta dokumenterade gata, omnämnd 1323. Namnet syftar på köpmännen som drev sin handel här.',
     en: 'Stockholm\'s earliest documented street, mentioned in 1323. Named after the merchants who traded along it.',
   },
+  // ─── Tillägg ───
+  'olof-palmes-gata': {
+    sv: 'Bytte namn 1986 till minne av statsministern Olof Palme. Hette tidigare Tunnelgatan, namngett efter den tunnel där Palme sköts.',
+    en: 'Renamed in 1986 in memory of Prime Minister Olof Palme. Was previously Tunnelgatan, after the pedestrian tunnel where Palme was shot.',
+  },
+  'master-samuelsgatan': {
+    sv: 'Uppkallad efter "mäster Samuel" som drev en krog vid gatan på 1600-talet. Idag en av Norrmalms genomfartsgator.',
+    en: 'Named after "master Samuel" who ran a tavern along the street in the 1600s. Now one of Norrmalm\'s through streets.',
+  },
+  'storgatan': {
+    sv: 'Östermalms huvudaxel och en av stadens äldsta paradgator från regleringen på 1880-talet. Ett tidigt exempel på rutnätsstadens stora boulevarder.',
+    en: 'Östermalm\'s main axis and one of the city\'s oldest parade streets from the 1880s planning. An early example of the grid city\'s grand boulevards.',
+  },
+  'skeppargatan': {
+    sv: 'En av Östermalms långa nord-sydliga gator. Namnet syftar på skeppare, alltså båtkaptener som bodde i området under 1800-talet.',
+    en: 'One of Östermalm\'s long north-south streets. Named after skeppare — boat captains who lived in the area during the 1800s.',
+  },
+  'banergatan': {
+    sv: 'Uppkallad efter fältmarskalken Johan Banér (1596-1641), en av Sveriges främsta härförare under trettioåriga kriget.',
+    en: 'Named after Field Marshal Johan Banér (1596-1641), one of Sweden\'s leading commanders during the Thirty Years\' War.',
+  },
+  'tunnelgatan': {
+    sv: 'Korta gatan som korsar Sveavägen och leder till tunneln upp mot Brunkebergsåsen. Här mördades Olof Palme 1986.',
+    en: 'Short street crossing Sveavägen and leading to the tunnel up to the Brunkeberg ridge. Olof Palme was assassinated here in 1986.',
+  },
+  'bondegatan': {
+    sv: 'Söders tvärgata med namn från ätten Bonde, en svensk adelsätt med riksråd och fältherrar under 1500- och 1600-talen.',
+    en: 'A cross street on Söder named after the Bonde family, a Swedish noble line with councillors and commanders in the 1500s and 1600s.',
+  },
+  'krukmakargatan': {
+    sv: 'På Söder, namngiven efter krukmakarna som hade sina verkstäder i området under 1700-talet.',
+    en: 'On Söder, named after the potters who kept workshops in the area during the 1700s.',
+  },
+  'pontonjargatan': {
+    sv: 'På Kungsholmen, uppkallad efter pontonjärerna — det militära förband som byggde flytbroar. Förbandet hade kasern i området fram till 1958.',
+    en: 'On Kungsholmen, named after the pontoniers — the military unit that built pontoon bridges. The regiment was barracked here until 1958.',
+  },
+  'bergsgatan': {
+    sv: 'Löper längs Kungsholmens bergshöjd. En av öns äldsta gator, omnämnd redan på 1700-talet.',
+    en: 'Runs along the high ridge of Kungsholmen. One of the island\'s oldest streets, mentioned as early as the 1700s.',
+  },
+  'pipersgatan': {
+    sv: 'Uppkallad efter greve Carl Piper (1647-1716), Karl XII:s mäktigaste rådgivare som dog som rysk fånge efter slaget vid Poltava.',
+    en: 'Named after Count Carl Piper (1647-1716), Karl XII\'s most powerful adviser who died as a Russian prisoner after the Battle of Poltava.',
+  },
+  'kungstradgardsgatan': {
+    sv: 'Följer den östra sidan av Kungsträdgården, kunglig trädgård sedan 1400-talet och idag en av Stockholms mest centrala parker.',
+    en: 'Runs along the east side of Kungsträdgården, a royal garden since the 1400s and today one of Stockholm\'s most central parks.',
+  },
+  'biblioteksgatan': {
+    sv: 'Lyxshoppinggatan som leder mot Stockholms stadsbibliotek. Området kallas "Bibban" i folkmun.',
+    en: 'The luxury shopping street leading toward Stockholm\'s city library. Locals call the area "Bibban".',
+  },
+  'tegnerlunden': {
+    sv: 'En liten park i Vasastan, uppkallad efter skalden Esaias Tegnér precis som Tegnérgatan intill.',
+    en: 'A small park in Vasastan, named after the poet Esaias Tegnér just like the neighbouring Tegnérgatan.',
+  },
+  'klarabergsviadukten': {
+    sv: 'Bron som lyfter trafiken över Centralstationens spår. Byggd som del av Norrmalmsregleringen och Stockholms moderna T-bana under 1950-talet.',
+    en: 'The viaduct that lifts traffic over the Central Station tracks. Built as part of the Norrmalm redevelopment and Stockholm\'s modern subway in the 1950s.',
+  },
+  'stortorget': {
+    sv: 'Stockholms äldsta torg, omnämnt redan 1300-talet. Här utspelade sig Stockholms blodbad 1520 då Kristian II lät avrätta över 80 personer.',
+    en: 'Stockholm\'s oldest square, mentioned as early as the 1300s. The site of the Stockholm Bloodbath of 1520 when Christian II had over 80 people executed.',
+  },
+  'slottsbacken': {
+    sv: 'Sluttar från Stockholms slott ner mot Skeppsbron. En av huvudvägarna in i Gamla stan från öster.',
+    en: 'Slopes from the Royal Palace down to Skeppsbron. One of the main approaches into Gamla stan from the east.',
+  },
+  'mynttorget': {
+    sv: 'Torget framför Riksdagshuset. Namnet kommer från det myntverk som låg här fram till 1850.',
+    en: 'The square in front of the Riksdag building. Named after the mint that operated here until 1850.',
+  },
 };
 
 function normalizeTriviaKey(name) {

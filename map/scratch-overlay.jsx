@@ -51,6 +51,10 @@ function attachScratchOverlay({ map, canvas, streets, activeDistricts, streetSta
 
     ctx.fillStyle = paperColor();
     ctx.fillRect(0, 0, cssW, cssH);
+    if (style.paperTint) {
+      ctx.fillStyle = style.paperTint;
+      ctx.fillRect(0, 0, cssW, cssH);
+    }
 
     ctx.fillStyle = `rgba(0,0,0,${0.02 + 0.025 * style.grain})`;
     const grainCount = Math.floor(cssW * cssH / (1200 / style.grain));
@@ -148,6 +152,8 @@ function drawStreetSketch(ctx, { streets, activeDistricts, streetStates, reveals
     ctx.stroke();
   };
 
+  const sketchInk = style.streetColor || inkColor;
+  const outlineHalo = style.outlineColor || 'rgba(255,250,232,0.76)';
   for (const street of streets) {
     if (activeDistricts && !activeDistricts.includes(street.district)) continue;
     const state = streetStates[street.id] || 'idle';
@@ -156,8 +162,8 @@ function drawStreetSketch(ctx, { streets, activeDistricts, streetStates, reveals
     const baseW = street.weight === 'thick' ? 3.2 : street.weight === 'medium' ? 2.2 : 1.4;
     const lineW = baseW * style.lineScale * Math.max(0.7, (zoom - 12) * 0.35);
     for (const way of street.ways) {
-      if (style.outline) strokeWay(way, lineW + 3.2, 'rgba(255,250,232,0.76)', alpha * 0.68);
-      strokeWay(way, lineW, inkColor, alpha);
+      if (style.outline) strokeWay(way, lineW + 3.2, outlineHalo, alpha * 0.68);
+      strokeWay(way, lineW, sketchInk, alpha);
     }
   }
   ctx.globalAlpha = 1;

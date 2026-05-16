@@ -1,12 +1,22 @@
 /* global window */
 // Gatlykta — low-level map rendering helpers used by LeafletMap.
 
+// Each preset can override the default ink colour for street strokes
+// (streetColor) and tint the paper with a translucent overlay (paperTint
+// as an "rgba(r,g,b,a)" string). Outline gets its own colour too so
+// cartoon and popart can have a hard white halo. Unset values fall back
+// to the neutral defaults that map/scratch-overlay.jsx uses today.
 const MAP_STYLE_PRESETS = {
-  sketch:     { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00, outline: false },
-  lithograph: { grain: 1.55, lineAlpha: 0.70, lineScale: 0.88, block: 1.12, outline: false },
-  cartoon:    { grain: 0.22, lineAlpha: 0.96, lineScale: 1.46, block: 1.05, outline: true },
-  minimalism: { grain: 0.25, lineAlpha: 0.46, lineScale: 0.68, block: 0.82, outline: false },
-  popart:     { grain: 0.62, lineAlpha: 0.92, lineScale: 1.24, block: 1.18, outline: true },
+  sketch:     { grain: 1.00, lineAlpha: 0.78, lineScale: 1.00, block: 1.00, outline: false,
+                streetColor: null, outlineColor: null, paperTint: null },
+  lithograph: { grain: 1.55, lineAlpha: 0.74, lineScale: 0.88, block: 1.12, outline: false,
+                streetColor: 'rgb(72, 42, 18)', outlineColor: null, paperTint: 'rgba(214, 168, 102, 0.10)' },
+  cartoon:    { grain: 0.22, lineAlpha: 0.98, lineScale: 1.52, block: 1.05, outline: true,
+                streetColor: 'rgb(15, 15, 18)', outlineColor: 'rgba(255, 252, 240, 0.86)', paperTint: 'rgba(255, 220, 120, 0.08)' },
+  minimalism: { grain: 0.18, lineAlpha: 0.42, lineScale: 0.62, block: 0.78, outline: false,
+                streetColor: 'rgb(80, 80, 86)', outlineColor: null, paperTint: 'rgba(245, 246, 248, 0.18)' },
+  popart:     { grain: 0.55, lineAlpha: 0.95, lineScale: 1.28, block: 1.18, outline: true,
+                streetColor: 'rgb(20, 70, 200)', outlineColor: 'rgba(255, 245, 60, 0.95)', paperTint: 'rgba(255, 90, 130, 0.10)' },
 };
 
 function getMapStylePreset(mapStyle) {
