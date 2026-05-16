@@ -52,15 +52,24 @@ npm run test:e2e
 
 ## Publicering
 
-Projektet är statiskt och kan publiceras direkt från repo-roten.
+Projektet är statiskt och kan publiceras direkt från repo-roten. Hostas på
+`gatlykta.riedberg.se` via GitHub Pages:
 
-Bra första alternativ:
+1. På GitHub: Settings → Pages → Source `Deploy from a branch`,
+   Branch `main` / `(root)`. Save.
+2. På Loopia (DNS för `riedberg.se`): lägg ett `CNAME`-record
+   - Namn: `gatlykta`
+   - Värde: `sanderriedberg.github.io.` (punkt på slutet)
+   - TTL: 3600
+3. Vänta 5-30 min på DNS-propagering. GitHub Pages utfärdar Let's
+   Encrypt-cert automatiskt så HTTPS funkar direkt.
 
-- GitHub Pages: publicera `main` från `/root`.
-- Cloudflare Pages: build command tom, output directory `/`.
-- Vercel/Netlify: statisk site utan buildsteg.
+`CNAME`-filen i repo-roten håller GitHub Pages koll på custom-domain;
+`data/remote-config.js` har publishable Supabase-key (säker att exponera
+eftersom RLS-policies styr åtkomsten).
 
-För `gatlykta.riedberg.se` pekas DNS vanligtvis som `CNAME gatlykta -> <github-användare>.github.io` om GitHub Pages används. Lägg sedan in custom domain i GitHub Pages-inställningarna.
+Andra alternativ utan ändring i koden: Cloudflare Pages, Netlify, Vercel
+— alla kör samma "deploy from main, no build" pipeline.
 
 ## Data
 
