@@ -60,6 +60,55 @@
     } catch { return false; }
   }
 
+  // Count rows for a (district, mode) plus how many sit above the given score
+  // tuple. Returns { rank, total } where rank is 1-indexed. Tie-breaker mirrors
+  // the leaderboard sort: points desc nulls last, then correct desc.
+  async function fetchRank(districtId, mode, { points, correct }) {
+    if (!isConfigured()) return null;
+    try {
+      const baseQS = new URLSearchParams({
+        city_id: 'eq.stockholm',
+        district_id: 'eq.' + (districtId || 'all'),
+        mode: 'eq.' + mode,
+      });
+      const totalRes = await fetch(`${window.SUPABASE_URL}/rest/v1/gatlykta_scores?${baseQS}&select=id`, {
+        headers: { ...headers(), 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' },
+      });
+      const totalRange = totalRes.headers.get('content-range') || '*/0';
+      const total = Number(totalRange.split('/')[1]) || 0;
+
+      // Build a "rows that strictly outrank me" filter:
+      //   points > mine, OR (points = mine AND correct > mine)
+      // PostgREST doesn't accept arbitrary OR with mixed columns easily, so we
+      // run two filtered counts and sum them.
+      let above = 0;
+      if (points != null) {
+        const qs1 = new URLSearchParams(baseQS);
+        qs1.append('points', `gt.${points}`);
+        const r1 = await fetch(`${window.SUPABASE_URL}/rest/v1/gatlykta_scores?${qs1}&select=id`, {
+          headers: { ...headers(), 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' },
+        });
+        above += Number((r1.headers.get('content-range') || '*/0').split('/')[1]) || 0;
+        const qs2 = new URLSearchParams(baseQS);
+        qs2.append('points', `eq.${points}`);
+        qs2.append('correct', `gt.${correct || 0}`);
+        const r2 = await fetch(`${window.SUPABASE_URL}/rest/v1/gatlykta_scores?${qs2}&select=id`, {
+          headers: { ...headers(), 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' },
+        });
+        above += Number((r2.headers.get('content-range') || '*/0').split('/')[1]) || 0;
+      } else {
+        // No points: rank by correct only, treating null points as equal.
+        const qs = new URLSearchParams(baseQS);
+        qs.append('correct', `gt.${correct || 0}`);
+        const r = await fetch(`${window.SUPABASE_URL}/rest/v1/gatlykta_scores?${qs}&select=id`, {
+          headers: { ...headers(), 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' },
+        });
+        above = Number((r.headers.get('content-range') || '*/0').split('/')[1]) || 0;
+      }
+      return { rank: above + 1, total };
+    } catch { return null; }
+  }
+
   async function fetchLeaderboard(districtId, mode, limit = 10) {
     if (!isConfigured()) return null;
     try {
@@ -86,5 +135,6 @@
     setPlayerName,
     pushScore,
     fetchLeaderboard,
+    fetchRank,
   };
 })();

@@ -164,6 +164,10 @@
     }, []);
 
     const [submitState, setSubmitState] = useS('idle'); // idle | submitting | done | error
+    const [rankInfo, setRankInfo] = useS(null);
+    const myClientId = useM(() => {
+      try { return (window.gatlyktaRemoteSync && window.gatlyktaRemoteSync.clientId()) || null; } catch { return null; }
+    }, []);
     const handleSubmitScore = useC(async () => {
       if (!remoteEnabled || submitState === 'submitting' || submitState === 'done') return;
       setSubmitState('submitting');
@@ -182,11 +186,17 @@
         if (!ok) allOk = false;
       }
       setSubmitState(allOk ? 'done' : 'error');
-      // Refetch so the new row shows up
       if (allOk) {
         const id = (districtIds && districtIds.length === 1) ? districtIds[0] : 'all';
         const rows = await window.gatlyktaRemoteSync.fetchLeaderboard(id, result.mode, 10);
         if (Array.isArray(rows)) setLeaderboard(rows);
+        if (window.gatlyktaRemoteSync.fetchRank) {
+          const info = await window.gatlyktaRemoteSync.fetchRank(id, result.mode, {
+            points: result.points || null,
+            correct: result.correct || 0,
+          });
+          if (info && info.total > 0) setRankInfo(info);
+        }
       }
     }, [remoteEnabled, submitState, districtIds, result, stars]);
 
@@ -257,14 +267,24 @@
               {leaderboard && leaderboard.length === 0 && <div className="meta">{t('results.leaderboard_empty')}</div>}
               {leaderboard && leaderboard.length > 0 && (
                 <ol className="leaderboard-list">
-                  {leaderboard.map((row, i) => (
-                    <li key={i}>
-                      <span className="rank">{i + 1}</span>
-                      <span className="who">{row.player_name || t('results.player_anonymous')}</span>
-                      <span className="score">{row.points != null ? `${row.points}p` : `${row.correct}/${row.total}`}</span>
-                    </li>
-                  ))}
+                  {leaderboard.map((row, i) => {
+                    const isMe = !!(playerName && row.player_name === playerName && submitState === 'done');
+                    return (
+                      <li key={i} className={isMe ? 'you' : ''}>
+                        <span className="rank">{i + 1}</span>
+                        <span className="who">{row.player_name || t('results.player_anonymous')}{isMe ? ' ←' : ''}</span>
+                        <span className="score">{row.points != null ? `${row.points}p` : `${row.correct}/${row.total}`}</span>
+                      </li>
+                    );
+                  })}
                 </ol>
+              )}
+              {rankInfo && (
+                <div className="leaderboard-rank">
+                  {rankInfo.rank === 1
+                    ? t('results.rank_first').replace('{total}', rankInfo.total)
+                    : t('results.rank_position').replace('{rank}', rankInfo.rank).replace('{total}', rankInfo.total)}
+                </div>
               )}
             </div>
           )}
